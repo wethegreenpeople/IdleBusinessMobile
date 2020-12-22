@@ -1,29 +1,25 @@
 package com.uraqt.idlebusiness.ui.login
 
+import android.content.SharedPreferences
+import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import android.util.Patterns
+import com.uraqt.idlebusiness.R
 import com.uraqt.idlebusiness.data.LoginRepository
 import com.uraqt.idlebusiness.data.Result
-
-import com.uraqt.idlebusiness.R
-import com.uraqt.idlebusiness.data.IdleBusinessApi
 import com.uraqt.idlebusiness.data.model.LoggedInUser
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.http.Header
-import java.io.IOException
-import java.util.*
 
-class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel() {
+class LoginViewModel(private val loginRepository: LoginRepository, private val appPrefs : SharedPreferences) : ViewModel() {
 
     private val _loginForm = MutableLiveData<LoginFormState>()
     val loginFormState: LiveData<LoginFormState> = _loginForm
 
     private val _loginResult = MutableLiveData<LoginResult>()
     val loginResult: LiveData<LoginResult> = _loginResult
+
+    private val _loginBusinessResult = MutableLiveData<LoggedInUser>()
+    val loginBusinessResult : LiveData<LoggedInUser> = _loginBusinessResult
 
     fun login(username: String, password: String) {
         // can be launched in a separate asynchronous job
@@ -39,7 +35,21 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
 
     fun guestLogin() {
         loginRepository.guestLogin { result ->
-            _loginResult.value = LoginResult(success = LoggedInUserView(displayName = result))
+            _loginBusinessResult.value = result
+        }
+    }
+
+    fun saveBusinessIdToPrefs(businessId : Int) {
+        with (appPrefs.edit()) {
+            putInt(R.string.current_business_id.toString(), businessId)
+            apply()
+        }
+    }
+
+    fun saveAuthTokenToPrefs(authToken : String) {
+        with (appPrefs.edit()) {
+            putString(R.string.current_auth_token.toString(), authToken)
+            apply()
         }
     }
 

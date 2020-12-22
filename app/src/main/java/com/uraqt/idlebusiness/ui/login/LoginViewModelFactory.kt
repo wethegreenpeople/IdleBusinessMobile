@@ -1,5 +1,6 @@
 package com.uraqt.idlebusiness.ui.login
 
+import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.uraqt.idlebusiness.data.LoginDataSource
@@ -9,7 +10,8 @@ import com.uraqt.idlebusiness.data.LoginRepository
  * ViewModel provider factory to instantiate LoginViewModel.
  * Required given LoginViewModel has a non-empty constructor
  */
-class LoginViewModelFactory : ViewModelProvider.Factory {
+class LoginViewModelFactory(prefs : SharedPreferences) : ViewModelProvider.Factory {
+    private val _prefs = prefs
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -17,7 +19,8 @@ class LoginViewModelFactory : ViewModelProvider.Factory {
             return LoginViewModel(
                 loginRepository = LoginRepository(
                     dataSource = LoginDataSource()
-                )
+                ),
+                appPrefs = _prefs
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

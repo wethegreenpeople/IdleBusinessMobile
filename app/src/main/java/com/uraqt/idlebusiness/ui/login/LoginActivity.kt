@@ -1,12 +1,9 @@
 package com.uraqt.idlebusiness.ui.login
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.annotation.StringRes
-import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -15,10 +12,11 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
-import androidx.navigation.findNavController
-import com.uraqt.idlebusiness.MainActivity
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.uraqt.idlebusiness.MainActivity2
-
 import com.uraqt.idlebusiness.R
 import kotlinx.android.synthetic.main.activity_login.*
 
@@ -36,7 +34,12 @@ class LoginActivity : AppCompatActivity() {
         val login = findViewById<Button>(R.id.login)
         val loading = findViewById<ProgressBar>(R.id.loading)
 
-        loginViewModel = ViewModelProviders.of(this, LoginViewModelFactory())
+
+        val sharedPref = this?.getSharedPreferences(
+            getString(R.string.sharedPrefs), Context.MODE_PRIVATE)
+
+
+        loginViewModel = ViewModelProviders.of(this, LoginViewModelFactory(sharedPref))
             .get(LoginViewModel::class.java)
 
         loginViewModel.loginFormState.observe(this@LoginActivity, Observer {
@@ -117,14 +120,12 @@ class LoginActivity : AppCompatActivity() {
             loginGuest.isEnabled = !loginState.isDataValid
         })
 
-        loginViewModel.loginResult.observe(this@LoginActivity, Observer {
+        loginViewModel.loginBusinessResult.observe(this@LoginActivity, Observer {
             val loginResult = it ?: return@Observer
 
-            if (loginResult.error != null) {
-                showLoginFailed(loginResult.error)
-            }
-            if (loginResult.success != null) {
+            if (loginViewModel.loginBusinessResult != null) {
                 val intent = Intent(this, MainActivity2::class.java)
+                loginViewModel.saveBusinessIdToPrefs(loginViewModel.loginBusinessResult.value!!.Id)
                 startActivity(intent)
             }
             setResult(Activity.RESULT_OK)

@@ -1,15 +1,11 @@
 package com.uraqt.idlebusiness.data
 
 import com.beust.klaxon.Klaxon
-import com.uraqt.idlebusiness.R
+import com.uraqt.idlebusiness.BuildConfig
 import com.uraqt.idlebusiness.data.model.LoggedInUser
-import com.uraqt.idlebusiness.ui.login.LoggedInUserView
-import com.uraqt.idlebusiness.ui.login.LoginResult
-import kotlinx.coroutines.delay
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.lang.Exception
 
 /**
  * Class that requests authentication and user information from the remote data source and
@@ -49,7 +45,7 @@ class LoginRepository(val dataSource: LoginDataSource) {
 
     private fun getNewBearerToken(callback : (result : String) -> Unit) {
         try {
-            IdleBusinessApi.retrofitService.getNewAuthToken("0e97bea9-5b7c-4668-a6d0-09766a83fa89").enqueue(
+            IdleBusinessApi.retrofitService.getNewAuthToken(BuildConfig.IdleBusinessApi).enqueue(
                 object: Callback<String> {
                     override fun onFailure(call: Call<String>, t: Throwable) {
                         throw Exception("Couldn't do it")
@@ -64,7 +60,7 @@ class LoginRepository(val dataSource: LoginDataSource) {
             throw e
         }
     }
-    private fun attemptGuestLogin(bearerToken : String, callback : (result : String) -> Unit) {
+    private fun attemptGuestLogin(bearerToken : String, callback : (result : LoggedInUser) -> Unit) {
         try {
             IdleBusinessApi.retrofitService.createGuest("Bearer $bearerToken").enqueue(
                 object: Callback<String> {
@@ -74,7 +70,7 @@ class LoginRepository(val dataSource: LoginDataSource) {
 
                     override fun onResponse(call: Call<String>, response: Response<String>) {
                         val guestAccount = Klaxon().parse<LoggedInUser>(json = response.body() ?: "")
-                        callback.invoke(guestAccount!!.Name)
+                        callback.invoke(guestAccount!!)
                     }
                 })
 
@@ -82,7 +78,7 @@ class LoginRepository(val dataSource: LoginDataSource) {
             throw e
         }
     }
-    fun guestLogin(callback : (result : String) -> Unit) {
+    fun guestLogin(callback : (result : LoggedInUser) -> Unit) {
         var bearerToken = ""
         getNewBearerToken {
             bearerToken = it
