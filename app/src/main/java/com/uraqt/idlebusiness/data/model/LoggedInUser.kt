@@ -6,5 +6,6 @@ package com.uraqt.idlebusiness.data.model
 data class LoggedInUser(
     var Name : String = "",
     var Id : Int,
-    var Cash : Double
+    var Cash : Double,
+    var CashPerSecond : Double
 )
