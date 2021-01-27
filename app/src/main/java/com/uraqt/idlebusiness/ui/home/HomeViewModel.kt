@@ -6,14 +6,17 @@ import androidx.lifecycle.ViewModel
 import com.uraqt.idlebusiness.BuildConfig
 import com.uraqt.idlebusiness.data.BusinessRepository
 import com.uraqt.idlebusiness.data.IdleBusinessApi
+import com.uraqt.idlebusiness.data.PurchasableRepository
 import com.uraqt.idlebusiness.data.model.LoggedInUser
+import com.uraqt.idlebusiness.data.model.Purchasable
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class HomeViewModel(businessId : Int, businessRepository: BusinessRepository) : ViewModel() {
+class HomeViewModel(businessId : Int, businessRepository: BusinessRepository, purchasableRepository: PurchasableRepository) : ViewModel() {
     private val _businessId : Int = businessId
     private val _businessRepository = businessRepository
+    private val _purchasableRepository = purchasableRepository
     private val _text = MutableLiveData<String>().apply {
         value = "This is home Fragment"
     }
@@ -26,6 +29,12 @@ class HomeViewModel(businessId : Int, businessRepository: BusinessRepository) : 
     var business : MutableLiveData<LoggedInUser> = _business
     init {
         getBusiness(_businessId)
+    }
+
+    private val _availablePurchases = MutableLiveData<Purchasable>()
+    var availablePurchases : MutableLiveData<Purchasable> = _availablePurchases
+    init {
+        getAvailablePurchases(_businessId, 1)
     }
 
     private fun getNewBearerToken(callback : (result : String) -> Unit) {
@@ -54,6 +63,14 @@ class HomeViewModel(businessId : Int, businessRepository: BusinessRepository) : 
                 business.postValue(businessResult)
             }
         }
-
+    }
+    private fun getAvailablePurchases(businessId : Int, purchasableTypeId : Int) {
+        var bearerToken = ""
+        getNewBearerToken { tokenResult ->
+            bearerToken = tokenResult
+            _purchasableRepository.getPurchasablesForBusiness(bearerToken, businessId, purchasableTypeId) { purchasableResult ->
+                availablePurchases.postValue(purchasableResult)
+            }
+        }
     }
 }
