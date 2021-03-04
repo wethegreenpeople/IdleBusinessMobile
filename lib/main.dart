@@ -6,6 +6,7 @@ import 'package:idlebusiness_mobile/Views/PurchaseAssets/PurchasableCards.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Stores/BusinessStore.dart';
 import 'Views/PurchaseAssets/CustomColors.dart';
+import 'Views/PurchaseAssets/PurchaseAssets.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/services.dart';
 import 'Views/BusinessDirectory/Directory.dart';
@@ -78,53 +79,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    index = 0;
-
-    _getBusiness().then((value) {
-      setState(() {
-        this.business = value;
-        this.business.addListener(() {
-          updateViews();
-        });
-      });
-    });
-
-    SystemChannels.lifecycle.setMessageHandler((msg) {
-      if (msg == AppLifecycleState.resumed.toString()) {
-        setState(() {});
-      }
-    });
-  }
-
-  void updateViews() {
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
-  Future<Business> _getBusiness() async {
-    final prefs = await SharedPreferences.getInstance();
-    try {
-      final businessId = prefs.getString('businessId');
-      final business = await fetchBusiness(businessId);
-      businessInfo = new BusinessInfo(
-        business: business,
-      );
-      return business;
-    } catch (Exception) {
-      return null;
-    }
-  }
-
-  Future<Widget> _getPurchasableCards(String purchasableTypeId) async {
-    try {
-      return PurchasableCards(
-        business: business,
-        purchasableTypeId: purchasableTypeId,
-      );
-    } catch (Exception) {
-      return SizedBox();
-    }
   }
 
   @override
@@ -134,177 +88,59 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-          bottomNavigationBar: new BottomNavigationBar(
-              currentIndex: this.index,
-              onTap: (int index) {
-                setState(() {
-                  if (this.index == index) return;
-                  this.index = index;
-                  switch (this.index) {
-                    case 0:
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  MyHomePage(title: 'Purchase Assets')));
-                      break;
-                    case 1:
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => DirectoryPage()));
-                      break;
-                    default:
-                      MyHomePage(title: 'Purchase Assets');
-                      break;
-                  }
-                });
-              },
-              items: <BottomNavigationBarItem>[
-                new BottomNavigationBarItem(
-                  icon: new Icon(Icons.attach_money),
-                  label: "Purchase Assets",
-                ),
-                new BottomNavigationBarItem(
-                  icon: new Icon(Icons.menu_book),
-                  label: "Business Directory",
-                ),
-                new BottomNavigationBarItem(
-                  icon: new Icon(Icons.mail),
-                  label: "Messages",
-                ),
-              ]),
-          backgroundColor: CustomColors.colorPrimaryBlue,
-          appBar: AppBar(
-            // Here we take the value from the MyHomePage object that was created by
-            // the App.build method, and use it to set our appbar title.
-            title: Text(widget.title),
-            backgroundColor: CustomColors.colorPrimaryBlueAccent,
-            bottom: TabBar(tabs: [
-              Tab(
-                  icon: Icon(Icons.face),
-                  text: "Employees",
-                  iconMargin: EdgeInsets.only(bottom: 5.0)),
-              Tab(
-                  icon: Icon(Icons.business_center),
-                  text: "Items",
-                  iconMargin: EdgeInsets.only(bottom: 5.0)),
-              Tab(
-                  icon: Icon(Icons.home),
-                  text: "Real Estate",
-                  iconMargin: EdgeInsets.only(bottom: 5.0)),
-            ]),
-          ),
-          drawer: Drawer(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: <Widget>[
-                DrawerHeader(
-                    child: SizedBox(),
-                    decoration:
-                        BoxDecoration(color: CustomColors.colorPrimaryBlue)),
-                ListTile(
-                  title: Text('Purchase Assets'),
-                  onTap: () {},
-                ),
-                ListTile(
-                  title: Text('Business Directory'),
-                  onTap: () {},
-                ),
-                ListTile(
-                  title: Text('Log out'),
-                  onTap: () {
-                    setState(() {
-                      void _setLoginState() async {
-                        final prefs = await SharedPreferences.getInstance();
-                        setState(() {
-                          prefs.setBool('isSignedIn', false);
-                        });
-                      }
-
-                      _setLoginState();
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => LoginPage()));
-                    });
-                  },
-                )
-              ],
-            ),
-          ),
-          body: Center(
-            child: TabBarView(children: [
-              Column(
-                children: <Widget>[
-                  business != null ? businessInfo : SizedBox(),
-                  if (business != null)
-                    FutureBuilder(
-                      future: _getPurchasableCards("1"),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return snapshot.data;
-                        }
-                        return CircularProgressIndicator();
-                      },
-                    ),
-                ],
-              ),
-              Column(
-                children: <Widget>[
-                  BusinessInfo(business: business),
-                  if (business != null)
-                    FutureBuilder(
-                      future: _getPurchasableCards("2"),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return snapshot.data;
-                        }
-                        return CircularProgressIndicator();
-                      },
-                    ),
-                ],
-              ),
-              Column(
-                children: <Widget>[
-                  BusinessInfo(business: business),
-                  if (business != null)
-                    FutureBuilder(
-                      future: _getPurchasableCards("3"),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return snapshot.data;
-                        }
-                        return CircularProgressIndicator();
-                      },
-                    ),
-                ],
-              )
-            ]),
-          )),
+    return PersistentTabView(
+      context,
+      controller: controller,
+      screens: _buildScreens(),
+      items: _navBarsItems(),
+      confineInSafeArea: true,
+      backgroundColor: CustomColors.colorPrimaryBlueAccent,
+      handleAndroidBackButtonPress: true,
+      resizeToAvoidBottomInset:
+          false, // This needs to be true if you want to move up the screen when keyboard appears.
+      stateManagement: true,
+      hideNavigationBarWhenKeyboardShows:
+          true, // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument.
+      decoration: NavBarDecoration(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(10.0)),
+        colorBehindNavBar: Colors.white,
+      ),
+      popAllScreensOnTapOfSelectedTab: true,
+      popActionScreens: PopActionScreensType.all,
+      itemAnimationProperties: ItemAnimationProperties(
+        // Navigation Bar's items animation properties.
+        duration: Duration(milliseconds: 200),
+        curve: Curves.ease,
+      ),
+      screenTransitionAnimation: ScreenTransitionAnimation(
+        // Screen transition animation on change of selected tab.
+        animateTabTransition: true,
+        curve: Curves.ease,
+        duration: Duration(milliseconds: 200),
+      ),
+      navBarStyle:
+          NavBarStyle.style10, // Choose the nav bar style with this property.
     );
   }
 
   List<Widget> _buildScreens() {
-    return [
-      MyHomePage(
-        title: 'Purchase Assets',
-      ),
-      DirectoryPage()
-    ];
+    return [PurchaseAssets(), DirectoryPage()];
   }
 
   List<PersistentBottomNavBarItem> _navBarsItems() {
     return [
       PersistentBottomNavBarItem(
-        icon: Icon(Icons.home),
-        title: ("Home"),
-      ),
+          icon: Icon(Icons.attach_money),
+          title: ("Purchase"),
+          activeColor: CustomColors.colorPrimaryButton,
+          activeColorAlternate: CustomColors.colorPrimaryWhite,
+          inactiveColor: Colors.grey),
       PersistentBottomNavBarItem(
-        icon: Icon(Icons.settings),
-        title: ("Settings"),
-      ),
+          icon: Icon(Icons.menu_book),
+          title: ("Directory"),
+          activeColor: CustomColors.colorPrimaryButton,
+          activeColorAlternate: CustomColors.colorPrimaryWhite,
+          inactiveColor: Colors.grey),
     ];
   }
 }

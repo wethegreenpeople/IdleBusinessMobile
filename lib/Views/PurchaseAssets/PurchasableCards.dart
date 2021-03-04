@@ -91,6 +91,12 @@ class _PurchasableCardsState extends State<PurchasableCards> {
       }
     });
 
+    // Adding a little empty space at the end to ensure cards don't get stuck behind
+    // any nav bars
+    widgets.add(SizedBox.fromSize(
+      size: Size(0, 10),
+    ));
+
     return ListView(
       children: widgets,
     );
