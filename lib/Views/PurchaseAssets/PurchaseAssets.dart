@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:idlebusiness_mobile/Views/Login/Login.dart';
 import 'package:idlebusiness_mobile/Views/PurchaseAssets/BusinessInfo.dart';
@@ -6,9 +5,7 @@ import 'package:idlebusiness_mobile/Views/PurchaseAssets/PurchasableCards.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Stores/BusinessStore.dart';
 import '../../Views/PurchaseAssets/CustomColors.dart';
-import 'package:sizer/sizer.dart';
 import 'package:flutter/services.dart';
-import '../../Views/BusinessDirectory/Directory.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 
 class PurchaseAssets extends StatefulWidget {
@@ -32,6 +29,7 @@ class _PurchaseAssetsState extends State<PurchaseAssets> {
     _getBusiness().then((value) {
       setState(() {
         this.business = value;
+        // Can I remove this?
         this.business.addListener(() {
           updateViews();
         });
