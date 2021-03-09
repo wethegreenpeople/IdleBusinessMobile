@@ -1,48 +1,44 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:idlebusiness_mobile/Helpers/AppHelper.dart';
 import 'package:idlebusiness_mobile/Stores/BusinessStore.dart';
 import 'package:idlebusiness_mobile/Stores/PurchasableStore.dart';
+import 'package:idlebusiness_mobile/Views/PurchaseAssets/PurchaseAssetsVM.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:provider/provider.dart';
 
 class PurchasableCards extends StatefulWidget {
-  final Business business;
+  final PurchaseAssetsVM viewModel;
   final String purchasableTypeId;
 
-  PurchasableCards({
-    this.business,
-    this.purchasableTypeId,
-  });
+  PurchasableCards({this.viewModel, this.purchasableTypeId});
 
   @override
   State<StatefulWidget> createState() => _PurchasableCardsState(
-      business: business, purchasableTypeId: purchasableTypeId);
+        viewModel: viewModel,
+        purchasableTypeId: purchasableTypeId,
+      );
 }
 
 class _PurchasableCardsState extends State<PurchasableCards> {
   Future<List<Purchasable>> futurePurchasables;
   List<Purchasable> purchasables;
   var purchaseAmount = 0;
-  final purchaseDebouncer = Debouncer(milliseconds: 750);
 
-  Business business;
+  final PurchaseAssetsVM viewModel;
   final String purchasableTypeId;
 
   _PurchasableCardsState({
-    this.business,
+    this.viewModel,
     this.purchasableTypeId,
   });
 
   @override
   void initState() {
     super.initState();
-    this.business.addListener(() {
-      updateCardStatus();
-    }, ["cash", "lifeTimeEarnings"]);
-    futurePurchasables =
-        fetchPurchasables(this.business?.id.toString(), purchasableTypeId);
-    fetchPurchasables(this.business?.id.toString(), purchasableTypeId)
+    futurePurchasables = fetchPurchasables(
+        this.viewModel.business.id.toString(), purchasableTypeId);
+    fetchPurchasables(this.viewModel.business.id.toString(), purchasableTypeId)
         .then((value) {
       setState(() {
         purchasables = value;
@@ -52,9 +48,6 @@ class _PurchasableCardsState extends State<PurchasableCards> {
 
   @override
   void dispose() {
-    this.business.removeListener(() {
-      updateCardStatus();
-    }, ["cash", "lifeTimeEarnings"]);
     super.dispose();
   }
 
@@ -66,26 +59,27 @@ class _PurchasableCardsState extends State<PurchasableCards> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 10.0),
-        child: purchasables != null
-            ? cardsFromPurchasableList(purchasables)
-            : SizedBox(),
-      ),
-    );
+    return Consumer<PurchaseAssetsVM>(
+        builder: (context, value, child) => Expanded(
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 10.0),
+                child: purchasables != null
+                    ? cardsFromPurchasableList(purchasables)
+                    : SizedBox(),
+              ),
+            ));
   }
 
   Widget cardsFromPurchasableList(List<Purchasable> purchasableList) {
     var widgets = new List<Widget>();
 
     purchasableList.forEach((element) {
-      if (isItemVisible(element, this.business)) {
+      if (isItemVisible(element, this.viewModel.business)) {
         widgets.add(Container(
             width: MediaQuery.of(context).size.width * .5,
             child: Card(
                 color: Colors.white,
-                child: isItemPurchasable(element, this.business)
+                child: isItemPurchasable(element, this.viewModel.business)
                     ? clickableCard(element)
                     : unclickableCard(element))));
       }
@@ -121,45 +115,7 @@ class _PurchasableCardsState extends State<PurchasableCards> {
   Widget clickableCard(Purchasable purchasable) {
     return InkWell(
       onTap: () {
-        purchaseAmount++;
-
-        // "fake" stats updates. Update stats immediately for the user's enjoyment
-        this.business.cash -= purchasable.calculateAdjustedCost();
-        this.business.cashPerSecond += purchasable.cashPerSecondMod;
-        this.business.maxItemAmount += purchasable.maxItemsMod;
-        this.business.maxEmployeeAmount += purchasable.maxEmployeeMod;
-        this.business.espionageChance += purchasable.espionageChanceMod;
-        this.business.espionageDefense += purchasable.espionageDefenseMod;
-        if (purchasable.purchasableTypeId == 1) this.business.amountEmployed++;
-        if (purchasable.purchasableTypeId == 2)
-          this.business.amountOwnedItems++;
-        setState(() {
-          // Current adjusted cost
-          purchasable.amountOwnedByBusiness +=
-              1; // Increase amount owned after taking adjusted cost
-        });
-
-        purchaseDebouncer.run(() => PurchasableStore()
-            .purchaseItem(this.business?.id.toString(),
-                purchasable.id.toString(), purchaseAmount.toString())
-            .then((value) => setState(() {
-                  // Real stats updates. Update stats based on db
-                  purchasable.amountOwnedByBusiness =
-                      value.purchasable.amountOwnedByBusiness;
-                  purchasable = value.purchasable;
-                  this.business.cash = value.business.cash;
-                  this.business.cashPerSecond = value.business.cashPerSecond;
-                  this.business.amountEmployed = value.business.amountEmployed;
-                  this.business.maxEmployeeAmount =
-                      value.business.maxEmployeeAmount;
-                  this.business.espionageChance =
-                      value.business.espionageChance;
-                  this.business.espionageDefense =
-                      value.business.espionageDefense;
-                  this.business.lifeTimeEarnings =
-                      value.business.lifeTimeEarnings;
-                }))
-            .whenComplete(() => purchaseAmount = 0));
+        viewModel.purchaseAsset(purchasable);
       },
       child: cardPurchaseInfo(purchasable),
     );

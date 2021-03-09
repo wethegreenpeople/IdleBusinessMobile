@@ -1,68 +1,61 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:idlebusiness_mobile/Stores/BusinessStore.dart';
+import 'package:idlebusiness_mobile/Views/PurchaseAssets/PurchaseAssetsVM.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'dart:async';
 import 'package:sizer/sizer.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class BusinessInfo extends StatefulWidget {
-  final Business business;
+  final PurchaseAssetsVM viewModel;
 
-  BusinessInfo({this.business});
+  BusinessInfo({this.viewModel});
 
   @override
-  _BusinessInfoState createState() => _BusinessInfoState(business: business);
+  _BusinessInfoState createState() => _BusinessInfoState(viewModel: viewModel);
 }
 
 class _BusinessInfoState extends State<BusinessInfo> {
   Future<Business> futureBusiness;
-  final Business business;
-  Timer timer;
+  final PurchaseAssetsVM viewModel;
   bool isCollapsed = true;
   _BusinessInfoState({
-    this.business,
+    this.viewModel,
   });
 
   @override
   void initState() {
     super.initState();
-    updateBusinessGains(this.business.id.toString());
-    this.business.addListener(() {
-      updateBusinessInfo();
-    });
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
-      if (mounted) {
-        setState(() {
-          this.business?.cash += this.business?.cashPerSecond;
-          this.business?.lifeTimeEarnings += this.business?.cashPerSecond;
-        });
-      }
-    });
+    updateBusinessGains(this.viewModel.business.id.toString());
+    viewModel.startCashIncreaseTimer();
   }
 
   @override
   void dispose() {
-    this.business.removeListener(() {
-      updateBusinessInfo();
-    });
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-        onTap: () {
-          isCollapsed = !isCollapsed;
-        },
-        child: AnimatedCrossFade(
-          duration: const Duration(milliseconds: 300),
-          firstChild: collapsedCards(),
-          secondChild: expandedCards(),
-          crossFadeState: isCollapsed
-              ? CrossFadeState.showFirst
-              : CrossFadeState.showSecond,
-        ));
+    return Consumer<PurchaseAssetsVM>(
+      builder: (context, value, child) {
+        return InkWell(
+            onTap: () {
+              isCollapsed = !isCollapsed;
+              setState(() {});
+            },
+            child: AnimatedCrossFade(
+              duration: const Duration(milliseconds: 300),
+              firstChild: collapsedCards(),
+              secondChild: expandedCards(),
+              crossFadeState: isCollapsed
+                  ? CrossFadeState.showFirst
+                  : CrossFadeState.showSecond,
+            ));
+      },
+    );
   }
 
   void updateBusinessInfo() async {
@@ -87,12 +80,13 @@ class _BusinessInfoState extends State<BusinessInfo> {
         children: <Widget>[
           fakeCardStack(
               Icons.attach_money,
-              Text(NumberFormat.compact().format(this.business?.cash ?? 0)),
+              Text(NumberFormat.compact()
+                  .format(this.viewModel.business.cash ?? 0)),
               "Cash"),
           fakeCardStack(
               Icons.schedule,
               Text(NumberFormat.compact()
-                  .format(this.business?.cashPerSecond ?? 0)),
+                  .format(this.viewModel.business.cashPerSecond ?? 0)),
               "Cash-per-second"),
         ],
       ),
@@ -114,22 +108,22 @@ class _BusinessInfoState extends State<BusinessInfo> {
                     child: ListTile(
                         leading: Icon(Icons.attach_money),
                         title: Text(NumberFormat.compact()
-                            .format(this.business?.cash ?? 0)),
+                            .format(this.viewModel.business.cash ?? 0)),
                         subtitle: Text('Cash'))),
                 Card(
                     child: ListTile(
                         leading: Icon(Icons.business_center),
-                        title: Text(NumberFormat.compact()
-                                .format(this.business?.amountOwnedItems ?? 0) +
+                        title: Text(NumberFormat.compact().format(
+                                this.viewModel.business.amountOwnedItems ?? 0) +
                             " / " +
-                            NumberFormat.compact()
-                                .format(this.business?.maxItemAmount ?? 0)),
+                            NumberFormat.compact().format(
+                                this.viewModel.business.maxItemAmount ?? 0)),
                         subtitle: Text('Items'))),
                 Card(
                     child: ListTile(
                         leading: Icon(MdiIcons.sword),
-                        title: Text(NumberFormat.percentPattern()
-                            .format(this.business?.espionageChance ?? 0)),
+                        title: Text(NumberFormat.percentPattern().format(
+                            this.viewModel.business.espionageChance ?? 0)),
                         subtitle: Text('Espionage Chance')))
               ],
             ),
@@ -141,23 +135,24 @@ class _BusinessInfoState extends State<BusinessInfo> {
                 Card(
                     child: ListTile(
                         leading: Icon(Icons.schedule),
-                        title: Text(NumberFormat.compact()
-                            .format(this.business?.cashPerSecond ?? 0)),
+                        title: Text(NumberFormat.compact().format(
+                            this.viewModel.business.cashPerSecond ?? 0)),
                         subtitle: Text('Cash-per-second'))),
                 Card(
                     child: ListTile(
                         leading: Icon(Icons.face),
-                        title: Text((NumberFormat.compact()
-                                .format(this.business?.amountEmployed ?? 0) +
+                        title: Text((NumberFormat.compact().format(
+                                this.viewModel.business.amountEmployed ?? 0) +
                             " / " +
                             (NumberFormat.compact().format(
-                                this.business?.maxEmployeeAmount ?? 0)))),
+                                this.viewModel.business.maxEmployeeAmount ??
+                                    0)))),
                         subtitle: Text('Employees'))),
                 Card(
                     child: ListTile(
                         leading: Icon(MdiIcons.shieldOutline),
-                        title: Text(NumberFormat.percentPattern()
-                            .format(this.business?.espionageDefense ?? 0)),
+                        title: Text(NumberFormat.percentPattern().format(
+                            this.viewModel.business.espionageDefense ?? 0)),
                         subtitle: Text('Espionage Defense')))
               ],
             ),

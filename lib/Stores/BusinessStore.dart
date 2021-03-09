@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 import 'package:idlebusiness_mobile/Helpers/AuthHelper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:property_change_notifier/property_change_notifier.dart';
 import 'StoreConfig.dart';
 
 Future<Business> fetchBusiness(String businessId) async {
@@ -126,23 +125,12 @@ Future<bool> updateBusinessGains(String businessId) async {
 }
 
 // ignore: mixin_inherits_from_not_object
-class Business extends PropertyChangeNotifier<String> {
+class Business {
   final int id;
   final String name;
 
-  double _cashPerSecond;
-  double get cashPerSecond => _cashPerSecond;
-  set cashPerSecond(double value) {
-    _cashPerSecond = value;
-    notifyListeners("cashPerSecond");
-  }
-
-  double _cash;
-  double get cash => _cash;
-  set cash(double value) {
-    _cash = value;
-    notifyListeners("cash");
-  }
+  double cashPerSecond;
+  double cash;
 
   double lifeTimeEarnings;
   int amountEmployed;
@@ -201,10 +189,5 @@ class Business extends PropertyChangeNotifier<String> {
     } catch (Exception) {
       return null;
     }
-  }
-
-  @override
-  void addListener(Function listener, [Iterable<String> properties]) {
-    super.addListener(listener, properties);
   }
 }
