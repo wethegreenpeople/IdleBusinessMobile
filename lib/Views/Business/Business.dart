@@ -154,27 +154,39 @@ class _BusinessPageState extends State<BusinessPage> {
   }
 
   Widget businessEspionages(Business business) {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-          child: Card(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                    title: Text(
-                  business.name + "'s Espionages",
-                  style: TextStyle(
-                    fontSize: 18.0.sp,
-                    fontStyle: FontStyle.italic,
+    return Container(
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+            child: Card(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                      title: Text(
+                    business.name + "'s Espionages",
+                    style: TextStyle(
+                      fontSize: 18.0.sp,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  )),
+                  SingleChildScrollView(
+                    child: Container(
+                      constraints: BoxConstraints(maxHeight: 20.0.h),
+                      child: ListView(
+                        children: [
+                          ...businessEspionageCards(business.espionages)
+                        ],
+                      ),
+                    ),
                   ),
-                )),
-              ],
+                ],
+              ),
             ),
-          ),
-        )
-      ],
+          )
+        ],
+      ),
     );
   }
 
@@ -223,6 +235,63 @@ class _BusinessPageState extends State<BusinessPage> {
                     child: ListTile(
                   leading: Icon(MdiIcons.chartBar),
                   title: Text("Investment"),
+                )),
+              ),
+            ],
+          );
+        },
+      ));
+    });
+
+    return widgets;
+  }
+
+  List<Widget> businessEspionageCards(List<Investment> espionages) {
+    if (espionages.length == 0) {
+      List<Widget> widget = [
+        Row(
+          children: [
+            Expanded(
+              child: Card(
+                  child: ListTile(
+                leading: Icon(MdiIcons.chartBar),
+                title: Text("No Espionages"),
+              )),
+            ),
+          ],
+        )
+      ];
+      return widget;
+    }
+
+    List<Widget> widgets = [];
+    espionages.forEach((element) {
+      widgets.add(FutureBuilder<Business>(
+        future: Business().getBusiness(element.businessInvestedInId.toString()),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Row(
+              children: [
+                Expanded(
+                  child: Card(
+                      child: ListTile(
+                          leading: Icon(MdiIcons.robber),
+                          title: Text("Espionaged " + snapshot.data.name),
+                          subtitle: Text("Stole: \$" +
+                              NumberFormat.decimalPattern()
+                                  .format(element.investmentAmount) +
+                              " CPS"))),
+                ),
+              ],
+            );
+          }
+          return Row(
+            children: [
+              Expanded(
+                child: Card(
+                    child: ListTile(
+                  leading: Icon(MdiIcons.chartBar),
+                  title: Text("Espionage"),
                 )),
               ),
             ],

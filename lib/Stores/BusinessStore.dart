@@ -142,6 +142,7 @@ class Business {
   int amountOwnedItems;
   double businessScore;
   List<Investment> investments;
+  List<Investment> espionages;
 
   Business(
       {this.id,
@@ -156,7 +157,8 @@ class Business {
       int maxItemAmount,
       int amountOwnedItems,
       double businessScore,
-      List<Investment> investments}) {
+      List<Investment> investments,
+      List<Investment> espionages}) {
     this.cash = cash;
     this.cashPerSecond = cashPerSecond;
     this.lifeTimeEarnings = lifeTimeEarnings;
@@ -168,6 +170,7 @@ class Business {
     this.amountOwnedItems = amountOwnedItems;
     this.businessScore = businessScore;
     this.investments = investments;
+    this.espionages = espionages;
   }
 
   factory Business.fromJson(Map<String, dynamic> json) {
@@ -175,6 +178,23 @@ class Business {
       List<Investment> investments = [];
       (json["BusinessInvestments"] as List).forEach((element) async {
         if (element["InvestmentType"] == 10) {
+          var investment = Investment();
+          investment.investmentAmount =
+              element["Investment"]["InvestmentAmount"];
+          int investedBusinessId =
+              element["Investment"]["BusinessInvestments"][0]["BusinessId"];
+          investment.businessInvestedInId = investedBusinessId;
+          investments.add(investment);
+        }
+      });
+
+      return investments;
+    }
+
+    List<Investment> getEspionagesFromJson(Map<String, dynamic> json) {
+      List<Investment> investments = [];
+      (json["BusinessInvestments"] as List).forEach((element) async {
+        if (element["InvestmentType"] == 20) {
           var investment = Investment();
           investment.investmentAmount =
               element["Investment"]["InvestmentAmount"];
@@ -201,7 +221,8 @@ class Business {
         maxItemAmount: json['MaxItemAmount'],
         amountOwnedItems: json['AmountOwnedItems'],
         businessScore: json['BusinessScore'],
-        investments: getInvestmentsFromJson(json));
+        investments: getInvestmentsFromJson(json),
+        espionages: getEspionagesFromJson(json));
   }
 
   Future<Business> getBusiness(String businessId) async {
