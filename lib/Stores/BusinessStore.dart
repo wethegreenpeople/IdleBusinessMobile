@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 import 'package:idlebusiness_mobile/Helpers/AuthHelper.dart';
+import 'package:idlebusiness_mobile/Models/Investment.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'StoreConfig.dart';
 
@@ -140,6 +141,7 @@ class Business {
   int maxItemAmount;
   int amountOwnedItems;
   double businessScore;
+  List<Investment> investments;
 
   Business(
       {this.id,
@@ -153,7 +155,8 @@ class Business {
       double espionageDefense,
       int maxItemAmount,
       int amountOwnedItems,
-      double businessScore}) {
+      double businessScore,
+      List<Investment> investments}) {
     this.cash = cash;
     this.cashPerSecond = cashPerSecond;
     this.lifeTimeEarnings = lifeTimeEarnings;
@@ -164,9 +167,27 @@ class Business {
     this.maxItemAmount = maxItemAmount;
     this.amountOwnedItems = amountOwnedItems;
     this.businessScore = businessScore;
+    this.investments = investments;
   }
 
   factory Business.fromJson(Map<String, dynamic> json) {
+    List<Investment> getInvestmentsFromJson(Map<String, dynamic> json) {
+      List<Investment> investments = [];
+      (json["BusinessInvestments"] as List).forEach((element) async {
+        if (element["InvestmentType"] == 10) {
+          var investment = Investment();
+          investment.investmentAmount =
+              element["Investment"]["InvestmentAmount"];
+          int investedBusinessId =
+              element["Investment"]["BusinessInvestments"][0]["BusinessId"];
+          investment.businessInvestedInId = investedBusinessId;
+          investments.add(investment);
+        }
+      });
+
+      return investments;
+    }
+
     return Business(
         id: json['Id'],
         name: json['Name'],
@@ -179,7 +200,8 @@ class Business {
         espionageDefense: json['EspionageDefense'],
         maxItemAmount: json['MaxItemAmount'],
         amountOwnedItems: json['AmountOwnedItems'],
-        businessScore: json['BusinessScore']);
+        businessScore: json['BusinessScore'],
+        investments: getInvestmentsFromJson(json));
   }
 
   Future<Business> getBusiness(String businessId) async {

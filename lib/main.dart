@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:idlebusiness_mobile/Views/Business/Business.dart';
 import 'package:idlebusiness_mobile/Views/Login/Login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Stores/BusinessStore.dart';
@@ -121,7 +122,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   List<Widget> _buildScreens() {
-    return [PurchaseAssets(), DirectoryPage()];
+    return [
+      PurchaseAssets(),
+      DirectoryPage(),
+    ];
   }
 
   List<PersistentBottomNavBarItem> _navBarsItems() {

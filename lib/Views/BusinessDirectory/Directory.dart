@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:idlebusiness_mobile/Stores/BusinessStore.dart';
+import 'package:idlebusiness_mobile/Views/BusinessDirectory/DirectoryVM.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,10 +18,12 @@ class DirectoryPage extends StatefulWidget {
 class _DirectoryPageState extends State<DirectoryPage> {
   Business business;
   _DirectoryPageState();
+  DirectoryVM _viewModel;
 
   @override
   void initState() {
     super.initState();
+    if (_viewModel == null) _viewModel = DirectoryVM();
     getSharedPrefs().then((value) {
       var businessId = value.getString('businessId');
       Business().getBusiness(businessId).then((value) {
@@ -155,20 +158,25 @@ class _DirectoryPageState extends State<DirectoryPage> {
 
     businessesList.forEach((element) {
       widgets.add(Card(
-        child: ListTile(
-          leading: Icon(MdiIcons.trophyVariant),
-          title: Text(element.name.toString()),
-          subtitle: RichText(
-            text: TextSpan(
-              children: [
-                WidgetSpan(
-                  child: Icon(Icons.score, size: 15),
-                ),
-                TextSpan(
-                    style: TextStyle(color: Colors.grey),
-                    text: NumberFormat.decimalPattern()
-                        .format(element.businessScore)),
-              ],
+        child: InkWell(
+          onTap: () {
+            _viewModel.navigateToBusiness(context, element.id);
+          },
+          child: ListTile(
+            leading: Icon(MdiIcons.trophyVariant),
+            title: Text(element.name.toString()),
+            subtitle: RichText(
+              text: TextSpan(
+                children: [
+                  WidgetSpan(
+                    child: Icon(Icons.score, size: 15),
+                  ),
+                  TextSpan(
+                      style: TextStyle(color: Colors.grey),
+                      text: NumberFormat.decimalPattern()
+                          .format(element.businessScore)),
+                ],
+              ),
             ),
           ),
         ),

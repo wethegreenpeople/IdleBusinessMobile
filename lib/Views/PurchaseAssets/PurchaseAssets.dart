@@ -102,14 +102,6 @@ class _PurchaseAssetsState extends State<PurchaseAssets> {
                       decoration:
                           BoxDecoration(color: CustomColors.colorPrimaryBlue)),
                   ListTile(
-                    title: Text('Purchase Assets'),
-                    onTap: () {},
-                  ),
-                  ListTile(
-                    title: Text('Business Directory'),
-                    onTap: () {},
-                  ),
-                  ListTile(
                     title: Text('Log out'),
                     onTap: () {
                       setState(() {
@@ -120,11 +112,18 @@ class _PurchaseAssetsState extends State<PurchaseAssets> {
                           });
                         }
 
-                        _setLoginState();
-                        Navigator.push(
+                        void pushLogin() async {
+                          await pushNewScreen(
                             context,
-                            MaterialPageRoute(
-                                builder: (context) => LoginPage()));
+                            screen: LoginPage(),
+                            withNavBar: false,
+                            pageTransitionAnimation:
+                                PageTransitionAnimation.cupertino,
+                          );
+                        }
+
+                        _setLoginState();
+                        pushLogin();
                       });
                     },
                   )
