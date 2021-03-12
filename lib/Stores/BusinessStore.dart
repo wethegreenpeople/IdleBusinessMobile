@@ -3,9 +3,56 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 import 'package:idlebusiness_mobile/Helpers/AuthHelper.dart';
+import 'package:idlebusiness_mobile/Models/ApiResponse.dart';
 import 'package:idlebusiness_mobile/Models/Investment.dart';
+import 'package:idlebusiness_mobile/Models/Message.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'StoreConfig.dart';
+
+class BusinessStore {
+  Future<ApiResponse> investInBusiness(
+      int investingBusinessId, int investedBusinessId, double investmentAmount,
+      {bool retry}) async {
+    bool _certificateCheck(X509Certificate cert, String host, int port) => true;
+
+    http.Client client() {
+      var ioClient = new HttpClient()
+        ..badCertificateCallback = _certificateCheck;
+      return new IOClient(ioClient);
+    }
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString("token");
+
+      final queryParams = {
+        "investingBusinessId": investingBusinessId.toString(),
+        "investedBusinessId": investedBusinessId.toString(),
+        "investmentAmount": investmentAmount.toString(),
+      };
+      var url =
+          Uri.https(StoreConfig.apiUrl, '/api/business/invest', queryParams);
+      final response = await client().post(url, headers: {
+        "Authorization": "Bearer $token",
+      });
+
+      if (response.statusCode == 200) {
+        // If the server did return a 200 OK response,
+        // then parse the JSON.
+        return ApiResponse(true, "");
+      } else if (response.statusCode == 401 && retry) {
+        Auth.saveNewToken();
+        return investInBusiness(
+            investingBusinessId, investedBusinessId, investmentAmount,
+            retry: false);
+      } else {
+        return ApiResponse(false, response.body);
+      }
+    } catch (Exception) {
+      return null;
+    }
+  }
+}
 
 Future<Business> fetchBusiness(String businessId) async {
   bool _certificateCheck(X509Certificate cert, String host, int port) => true;
@@ -18,6 +65,8 @@ Future<Business> fetchBusiness(String businessId) async {
   try {
     final prefs = await SharedPreferences.getInstance();
     var token = prefs.getString("token");
+
+    await updateBusinessGains(businessId);
 
     var url = Uri.https(StoreConfig.apiUrl, '/api/business/$businessId');
     final response = await client().get(url, headers: {
@@ -80,6 +129,49 @@ Future<List<Business>> fetchLeaderboard([bool retry]) async {
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
+      throw Exception('Failed to load business');
+    }
+  } catch (Exception) {
+    return null;
+  }
+}
+
+Future<List<Message>> fetchMessages(String businessId, [bool retry]) async {
+  bool _certificateCheck(X509Certificate cert, String host, int port) => true;
+
+  http.Client client() {
+    var ioClient = new HttpClient()..badCertificateCallback = _certificateCheck;
+    return new IOClient(ioClient);
+  }
+
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString("token");
+
+    final queryParams = {
+      "businessId": businessId,
+      "amountOfResults": "30",
+    };
+    var url =
+        Uri.https(StoreConfig.apiUrl, '/api/business/messages', queryParams);
+    final response = await client().get(url, headers: {
+      "Authorization": "Bearer $token",
+    });
+
+    if (response.statusCode == 200) {
+      List<Message> messagesList = [];
+      var responseJson = json.decode(response.body);
+      (responseJson as List).forEach((element) {
+        messagesList.add(Message.fromJson(element));
+      });
+      return messagesList;
+    } else if (response.statusCode == 401) {
+      if (retry) {
+        Auth.saveNewToken();
+        return fetchMessages(businessId, false);
+      }
+      throw Exception('Failed to load messages');
+    } else {
       throw Exception('Failed to load business');
     }
   } catch (Exception) {
@@ -183,7 +275,10 @@ class Business {
               element["Investment"]["InvestmentAmount"];
           int investedBusinessId =
               element["Investment"]["BusinessInvestments"][0]["BusinessId"];
+          int investmentDirection = element["Investment"]["BusinessInvestments"]
+              [0]["InvestmentDirection"];
           investment.businessInvestedInId = investedBusinessId;
+          investment.investmentDirection = investmentDirection;
           investments.add(investment);
         }
       });
@@ -200,7 +295,10 @@ class Business {
               element["Investment"]["InvestmentAmount"];
           int investedBusinessId =
               element["Investment"]["BusinessInvestments"][0]["BusinessId"];
+          int investmentDirection = element["Investment"]["BusinessInvestments"]
+              [0]["InvestmentDirection"];
           investment.businessInvestedInId = investedBusinessId;
+          investment.investmentDirection = investmentDirection;
           investments.add(investment);
         }
       });
@@ -229,6 +327,15 @@ class Business {
     try {
       final business = await fetchBusiness(businessId);
       return business;
+    } catch (Exception) {
+      return null;
+    }
+  }
+
+  Future<List<Message>> getBusinessMessages(String businessId) async {
+    try {
+      final List<Message> messages = await fetchMessages(businessId, true);
+      return messages;
     } catch (Exception) {
       return null;
     }

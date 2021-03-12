@@ -26,12 +26,6 @@ class _PurchaseAssetsState extends State<PurchaseAssets> {
   void initState() {
     super.initState();
     index = 0;
-
-    SystemChannels.lifecycle.setMessageHandler((msg) {
-      if (msg == AppLifecycleState.resumed.toString()) {
-        updateViews();
-      }
-    });
   }
 
   void updateViews() {

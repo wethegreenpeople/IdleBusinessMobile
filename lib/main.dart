@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:idlebusiness_mobile/Views/Business/Business.dart';
 import 'package:idlebusiness_mobile/Views/Login/Login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Stores/BusinessStore.dart';
+import 'Views/Messages/Messages.dart';
 import 'Views/PurchaseAssets/CustomColors.dart';
 import 'Views/PurchaseAssets/PurchaseAssets.dart';
 import 'package:sizer/sizer.dart';
@@ -77,6 +79,12 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+
+    SystemChannels.lifecycle.setMessageHandler((msg) {
+      if (msg == AppLifecycleState.resumed.toString()) {
+        setState(() {});
+      }
+    });
   }
 
   @override
@@ -125,6 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return [
       PurchaseAssets(),
       DirectoryPage(),
+      MessagesPage(),
     ];
   }
 
@@ -139,6 +148,12 @@ class _MyHomePageState extends State<MyHomePage> {
       PersistentBottomNavBarItem(
           icon: Icon(Icons.menu_book),
           title: ("Directory"),
+          activeColor: CustomColors.colorPrimaryButton,
+          activeColorAlternate: CustomColors.colorPrimaryWhite,
+          inactiveColor: Colors.grey),
+      PersistentBottomNavBarItem(
+          icon: Icon(Icons.email),
+          title: ("Messages"),
           activeColor: CustomColors.colorPrimaryButton,
           activeColorAlternate: CustomColors.colorPrimaryWhite,
           inactiveColor: Colors.grey),
