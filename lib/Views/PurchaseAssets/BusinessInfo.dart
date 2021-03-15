@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:idlebusiness_mobile/Models/BusinessInfoType.dart';
 import 'package:idlebusiness_mobile/Stores/BusinessStore.dart';
 import 'package:idlebusiness_mobile/Views/PurchaseAssets/PurchaseAssetsVM.dart';
 import 'package:intl/intl.dart';
@@ -11,20 +12,21 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 
 class BusinessInfo extends StatefulWidget {
   final PurchaseAssetsVM viewModel;
+  final BusinessInfoType infoType;
 
-  BusinessInfo({this.viewModel});
+  BusinessInfo({this.viewModel, this.infoType});
 
   @override
-  _BusinessInfoState createState() => _BusinessInfoState(viewModel: viewModel);
+  _BusinessInfoState createState() =>
+      _BusinessInfoState(viewModel: viewModel, infoType: infoType);
 }
 
 class _BusinessInfoState extends State<BusinessInfo> {
   Future<Business> futureBusiness;
   final PurchaseAssetsVM viewModel;
+  final BusinessInfoType infoType;
   bool isCollapsed = true;
-  _BusinessInfoState({
-    this.viewModel,
-  });
+  _BusinessInfoState({this.viewModel, this.infoType});
 
   @override
   void initState() {
@@ -49,7 +51,7 @@ class _BusinessInfoState extends State<BusinessInfo> {
             },
             child: AnimatedCrossFade(
               duration: const Duration(milliseconds: 300),
-              firstChild: collapsedCards(),
+              firstChild: collapsedCards(this.infoType),
               secondChild: expandedCards(),
               crossFadeState: isCollapsed
                   ? CrossFadeState.showFirst
@@ -65,14 +67,43 @@ class _BusinessInfoState extends State<BusinessInfo> {
     }
   }
 
-  Widget businessCards() {
+  Widget businessCards(BusinessInfoType infoType) {
     if (isCollapsed) {
-      return collapsedCards();
+      return collapsedCards(infoType);
     }
     return expandedCards();
   }
 
-  Widget collapsedCards() {
+  Widget collapsedCards(BusinessInfoType infoType) {
+    Widget getFakeStack() {
+      switch (infoType) {
+        case BusinessInfoType.items:
+          return fakeCardStack(
+              Icons.business_center,
+              Text(NumberFormat.compact()
+                      .format(this.viewModel.business.amountOwnedItems ?? 0) +
+                  "/" +
+                  NumberFormat.compact()
+                      .format(this.viewModel.business.maxItemAmount ?? 0)),
+              "Items");
+        case BusinessInfoType.realEstate:
+          return fakeCardStack(
+              Icons.face,
+              Text(NumberFormat.compact()
+                      .format(this.viewModel.business.amountEmployed ?? 0) +
+                  "/" +
+                  NumberFormat.compact()
+                      .format(this.viewModel.business.maxEmployeeAmount ?? 0)),
+              "Employees");
+        default:
+          return fakeCardStack(
+              Icons.schedule,
+              Text(NumberFormat.compact()
+                  .format(this.viewModel.business.cashPerSecond ?? 0)),
+              "Cash-per-second");
+      }
+    }
+
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10.0),
       height: 78,
@@ -84,11 +115,7 @@ class _BusinessInfoState extends State<BusinessInfo> {
               Text(NumberFormat.compact()
                   .format(this.viewModel.business.cash ?? 0)),
               "Cash"),
-          fakeCardStack(
-              Icons.schedule,
-              Text(NumberFormat.compact()
-                  .format(this.viewModel.business.cashPerSecond ?? 0)),
-              "Cash-per-second"),
+          getFakeStack(),
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:idlebusiness_mobile/Models/BusinessInfoType.dart';
 import 'package:idlebusiness_mobile/Views/Login/Login.dart';
 import 'package:idlebusiness_mobile/Views/PurchaseAssets/BusinessInfo.dart';
 import 'package:idlebusiness_mobile/Views/PurchaseAssets/PurchasableCards.dart';
@@ -131,12 +132,18 @@ class _PurchaseAssetsState extends State<PurchaseAssets> {
                   if (viewModel == null)
                     viewModel = PurchaseAssetsVM(snapshot.data);
                   if (_businessInfo == null)
-                    _businessInfo = BusinessInfo(viewModel: this.viewModel);
+                    _businessInfo = BusinessInfo(
+                      viewModel: this.viewModel,
+                      infoType: BusinessInfoType.cashPerSecond,
+                    );
                   return Center(
                     child: TabBarView(children: [
                       Column(
                         children: <Widget>[
-                          _businessInfo,
+                          BusinessInfo(
+                            viewModel: this.viewModel,
+                            infoType: BusinessInfoType.cashPerSecond,
+                          ),
                           FutureBuilder(
                             future: _getPurchasableCards("1"),
                             builder: (context, snapshot) {
@@ -150,7 +157,10 @@ class _PurchaseAssetsState extends State<PurchaseAssets> {
                       ),
                       Column(
                         children: <Widget>[
-                          _businessInfo,
+                          BusinessInfo(
+                            viewModel: this.viewModel,
+                            infoType: BusinessInfoType.items,
+                          ),
                           FutureBuilder(
                             future: _getPurchasableCards("2"),
                             builder: (context, snapshot) {
@@ -164,7 +174,10 @@ class _PurchaseAssetsState extends State<PurchaseAssets> {
                       ),
                       Column(
                         children: <Widget>[
-                          _businessInfo,
+                          BusinessInfo(
+                            viewModel: this.viewModel,
+                            infoType: BusinessInfoType.realEstate,
+                          ),
                           FutureBuilder(
                             future: _getPurchasableCards("3"),
                             builder: (context, snapshot) {
