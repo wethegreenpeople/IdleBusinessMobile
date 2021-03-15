@@ -458,7 +458,16 @@ class _BusinessPageState extends State<BusinessPage> {
                                 text: "Chance of success: ",
                                 style: TextStyle(color: Colors.grey)),
                             TextSpan(
-                                text: "${snapshot.data[0]}%\n\n",
+                                text: "${snapshot.data[0]}%\n",
+                                style: TextStyle(
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.bold)),
+                            TextSpan(
+                                text: "Cost of espionage: ",
+                                style: TextStyle(color: Colors.grey)),
+                            TextSpan(
+                                text:
+                                    "${_viewModel.viewingBusinessEspionageCost}\n\n",
                                 style: TextStyle(
                                     color: Colors.grey,
                                     fontWeight: FontWeight.bold)),
@@ -495,18 +504,16 @@ class _BusinessPageState extends State<BusinessPage> {
                             EdgeInsets.fromLTRB(10.0.w, 1.0.h, 10.0.w, 1.0.h),
                         child: ElevatedButton(
                             onPressed: () async {
-                              var result = await _viewModel.investInBusiness(
-                                  double.parse(
-                                      investmentAmountController.text));
+                              var result = await _viewModel.espionageBusiness();
                               if (result.success) {
                                 showDialog(
                                     context: context,
                                     builder: (context) => AlertDialog(
                                           title: Text('Success!'),
-                                          content: Text("Invested \$" +
-                                              investmentAmountController.text +
-                                              " in " +
-                                              _viewModel.viewedBusinessName),
+                                          content: Text(
+                                              "Commited espionage against " +
+                                                  _viewModel
+                                                      .viewedBusinessName),
                                         ));
                               } else {
                                 showDialog(

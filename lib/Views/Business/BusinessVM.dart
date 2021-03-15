@@ -1,5 +1,6 @@
 import 'package:idlebusiness_mobile/Models/ApiResponse.dart';
 import 'package:idlebusiness_mobile/Stores/BusinessStore.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BusinessVM {
@@ -9,6 +10,12 @@ class BusinessVM {
 
   String get viewedBusinessName {
     return _viewedBusiness.name;
+  }
+
+  String get viewingBusinessEspionageCost {
+    return NumberFormat.compact()
+        .format(_viewingBusiness.espionageCost)
+        .toString();
   }
 
   BusinessVM(int viewedBusinessId) {
@@ -50,6 +57,13 @@ class BusinessVM {
     await _ensureBusinessesArePopulated();
     var response = await BusinessStore().investInBusiness(
         _viewingBusiness.id, _viewedBusiness.id, investmentAmount);
+    return response;
+  }
+
+  Future<ApiResponse> espionageBusiness() async {
+    await _ensureBusinessesArePopulated();
+    var response = await BusinessStore()
+        .espionageBusiness(_viewingBusiness.id, _viewedBusiness.id);
     return response;
   }
 

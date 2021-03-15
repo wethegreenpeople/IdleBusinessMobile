@@ -52,6 +52,47 @@ class BusinessStore {
       return null;
     }
   }
+
+  Future<ApiResponse> espionageBusiness(
+      int attackingBusinessId, int defendingBusinessId,
+      {bool retry}) async {
+    bool _certificateCheck(X509Certificate cert, String host, int port) => true;
+
+    http.Client client() {
+      var ioClient = new HttpClient()
+        ..badCertificateCallback = _certificateCheck;
+      return new IOClient(ioClient);
+    }
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString("token");
+
+      final queryParams = {
+        "attackingBusinessId": attackingBusinessId.toString(),
+        "defendingBusinessId": defendingBusinessId.toString(),
+      };
+      var url =
+          Uri.https(StoreConfig.apiUrl, '/api/business/espionage', queryParams);
+      final response = await client().post(url, headers: {
+        "Authorization": "Bearer $token",
+      });
+
+      if (response.statusCode == 200) {
+        if (response.body == "Unsuccessful Espionage")
+          return ApiResponse(false, "Failed to espionage business");
+        return ApiResponse(true, "");
+      } else if (response.statusCode == 401 && retry) {
+        Auth.saveNewToken();
+        return espionageBusiness(attackingBusinessId, defendingBusinessId,
+            retry: false);
+      } else {
+        return ApiResponse(false, response.body);
+      }
+    } catch (Exception) {
+      return null;
+    }
+  }
 }
 
 Future<Business> fetchBusiness(String businessId) async {
@@ -233,6 +274,7 @@ class Business {
   int maxItemAmount;
   int amountOwnedItems;
   double businessScore;
+  double espionageCost;
   List<Investment> investments;
   List<Investment> espionages;
 
@@ -249,6 +291,7 @@ class Business {
       int maxItemAmount,
       int amountOwnedItems,
       double businessScore,
+      double espionageCost,
       List<Investment> investments,
       List<Investment> espionages}) {
     this.cash = cash;
@@ -261,6 +304,7 @@ class Business {
     this.maxItemAmount = maxItemAmount;
     this.amountOwnedItems = amountOwnedItems;
     this.businessScore = businessScore;
+    this.espionageCost = espionageCost;
     this.investments = investments;
     this.espionages = espionages;
   }
@@ -319,6 +363,7 @@ class Business {
         maxItemAmount: json['MaxItemAmount'],
         amountOwnedItems: json['AmountOwnedItems'],
         businessScore: json['BusinessScore'],
+        espionageCost: json['EspionageCost'],
         investments: getInvestmentsFromJson(json),
         espionages: getEspionagesFromJson(json));
   }
