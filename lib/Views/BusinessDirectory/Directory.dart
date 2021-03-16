@@ -51,6 +51,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
           children: <Widget>[
             myBusinessCard(),
             topBusinesses(),
+            searchForBusinessCard()
           ],
         ));
   }
@@ -133,6 +134,77 @@ class _DirectoryPageState extends State<DirectoryPage> {
                               title: Text(NumberFormat.compact()
                                   .format(this.business?.businessScore ?? 0)),
                               subtitle: Text('Score'))),
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget searchForBusinessCard() {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+          child: Card(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                    title: Text(
+                  "Find Business",
+                  style: TextStyle(
+                    fontSize: 18.0.sp,
+                    fontStyle: FontStyle.italic,
+                  ),
+                )),
+                Row(
+                  children: [
+                    Expanded(
+                        child: Padding(
+                      padding: EdgeInsets.fromLTRB(10, 0, 10, 10),
+                      child: TextFormField(
+                        controller: _viewModel.searchForBusinessController,
+                        maxLines: 1,
+                        keyboardType: TextInputType.name,
+                        autofocus: false,
+                        decoration: new InputDecoration(
+                            hintText: 'Lookup business',
+                            icon: new Icon(
+                              Icons.search,
+                              color: Colors.grey,
+                            )),
+                      ),
+                    )),
+                    Expanded(
+                      child: Padding(
+                        padding:
+                            EdgeInsets.fromLTRB(10.0.w, 1.0.h, 10.0.w, 1.0.h),
+                        child: ElevatedButton(
+                            onPressed: () async {
+                              var result = await _viewModel.searchForBusiness(
+                                  _viewModel.searchForBusinessController.text);
+                              if (result != null) {
+                                _viewModel.navigateToBusiness(
+                                    context, result.id);
+                              } else {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                          title: Text(':('),
+                                          content: Text("Could not find " +
+                                              _viewModel
+                                                  .searchForBusinessController
+                                                  .text),
+                                        ));
+                              }
+                            },
+                            child: Text('Search')),
+                      ),
                     )
                   ],
                 ),

@@ -395,6 +395,8 @@ class _BusinessPageState extends State<BusinessPage> {
                                           content: Text(result.returnValue),
                                         ));
                               }
+
+                              setState(() {});
                             },
                             child: Text('Invest')),
                       ),

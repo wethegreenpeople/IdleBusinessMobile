@@ -131,6 +131,40 @@ Future<Business> fetchBusiness(String businessId) async {
   }
 }
 
+Future<Business> fetchBusinessByName(String businessName) async {
+  bool _certificateCheck(X509Certificate cert, String host, int port) => true;
+
+  http.Client client() {
+    var ioClient = new HttpClient()..badCertificateCallback = _certificateCheck;
+    return new IOClient(ioClient);
+  }
+
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString("token");
+
+    final queryParams = {
+      "businessName": businessName,
+    };
+    var url = Uri.https(
+        StoreConfig.apiUrl, '/api/business/businessbyname', queryParams);
+    final response = await client().get(url, headers: {
+      "Authorization": "Bearer $token",
+    });
+
+    if (response.statusCode == 200) {
+      return Business.fromJson(json.decode(response.body));
+    } else if (response.statusCode == 401) {
+      Auth.saveNewToken();
+      return fetchBusinessByName(businessName);
+    } else {
+      return null;
+    }
+  } catch (Exception) {
+    return null;
+  }
+}
+
 Future<List<Business>> fetchLeaderboard([bool retry]) async {
   bool _certificateCheck(X509Certificate cert, String host, int port) => true;
 
