@@ -1,9 +1,13 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:idlebusiness_mobile/Helpers/AppHelper.dart';
 import 'package:idlebusiness_mobile/Stores/BusinessStore.dart';
 import 'package:idlebusiness_mobile/Stores/PurchasableStore.dart';
+import 'package:idlebusiness_mobile/Views/Login/Login.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PurchaseAssetsVM extends ChangeNotifier {
   final Business business;
@@ -59,5 +63,24 @@ class PurchaseAssetsVM extends ChangeNotifier {
         notifyListeners();
       });
     }
+  }
+
+  Future<void> _setLoginState() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isSignedIn', false);
+  }
+
+  Future<void> _pushLogin(BuildContext context) async {
+    await pushNewScreen(
+      context,
+      screen: LoginPage(),
+      withNavBar: false,
+      pageTransitionAnimation: PageTransitionAnimation.cupertino,
+    );
+  }
+
+  void logOut(BuildContext context) async {
+    await _setLoginState();
+    await _pushLogin(context);
   }
 }

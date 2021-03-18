@@ -7,7 +7,6 @@ import 'package:idlebusiness_mobile/Views/PurchaseAssets/PurchaseAssetsVM.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Stores/BusinessStore.dart';
 import '../../Views/PurchaseAssets/CustomColors.dart';
-import 'package:flutter/services.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:provider/provider.dart';
 
@@ -42,6 +41,7 @@ class _PurchaseAssetsState extends State<PurchaseAssets> {
       final business = await fetchBusiness(businessId);
       return business;
     } catch (Exception) {
+      viewModel.logOut(context);
       return null;
     }
   }
@@ -59,11 +59,6 @@ class _PurchaseAssetsState extends State<PurchaseAssets> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return ChangeNotifierProvider(
       create: (context) => viewModel,
       child: DefaultTabController(
@@ -100,25 +95,7 @@ class _PurchaseAssetsState extends State<PurchaseAssets> {
                     title: Text('Log out'),
                     onTap: () {
                       setState(() {
-                        void _setLoginState() async {
-                          final prefs = await SharedPreferences.getInstance();
-                          setState(() {
-                            prefs.setBool('isSignedIn', false);
-                          });
-                        }
-
-                        void pushLogin() async {
-                          await pushNewScreen(
-                            context,
-                            screen: LoginPage(),
-                            withNavBar: false,
-                            pageTransitionAnimation:
-                                PageTransitionAnimation.cupertino,
-                          );
-                        }
-
-                        _setLoginState();
-                        pushLogin();
+                        viewModel.logOut(context);
                       });
                     },
                   )
