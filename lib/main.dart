@@ -1,9 +1,11 @@
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:idlebusiness_mobile/Views/Business/Business.dart';
 import 'package:idlebusiness_mobile/Views/Login/Login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'Services/FireBase.dart';
 import 'Stores/BusinessStore.dart';
 import 'Views/Messages/Messages.dart';
 import 'Views/PurchaseAssets/CustomColors.dart';
@@ -17,6 +19,9 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  final FirebaseAnalyticsObserver firebaseObserver =
+      FirebaseAnalyticsObserver(analytics: analytics);
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -25,6 +30,7 @@ class MyApp extends StatelessWidget {
           SizerUtil().init(constraints, orientation);
           return MaterialApp(
             title: 'IdleBusiness',
+            navigatorObservers: [firebaseObserver],
             theme: ThemeData(
               primarySwatch: CustomColors.colorPrimaryBlueAccent,
               visualDensity: VisualDensity.adaptivePlatformDensity,
