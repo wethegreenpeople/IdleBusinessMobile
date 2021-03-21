@@ -2,9 +2,9 @@ import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:idlebusiness_mobile/Views/Business/Business.dart';
 import 'package:idlebusiness_mobile/Views/Login/Login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'Helpers/LifeCycleHelper.dart';
 import 'Services/FireBase.dart';
 import 'Stores/BusinessStore.dart';
 import 'Views/Messages/Messages.dart';
@@ -86,11 +86,8 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
-    SystemChannels.lifecycle.setMessageHandler((msg) {
-      if (msg == AppLifecycleState.resumed.toString()) {
-        setState(() {});
-      }
-    });
+    WidgetsBinding.instance.addObserver(
+        LifecycleEventHandler(resumeCallBack: () async => setState(() {})));
   }
 
   @override
