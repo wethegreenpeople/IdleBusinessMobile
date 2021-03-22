@@ -145,21 +145,21 @@ class _MyHomePageState extends State<MyHomePage> {
       PersistentBottomNavBarItem(
           icon: Icon(Icons.attach_money),
           title: ("Purchase"),
-          activeColor: CustomColors.colorPrimaryButton,
-          activeColorAlternate: CustomColors.colorPrimaryWhite,
-          inactiveColor: Colors.grey),
+          activeColorPrimary: CustomColors.colorPrimaryButton,
+          activeColorSecondary: CustomColors.colorPrimaryWhite,
+          inactiveColorPrimary: Colors.grey),
       PersistentBottomNavBarItem(
           icon: Icon(Icons.menu_book),
           title: ("Directory"),
-          activeColor: CustomColors.colorPrimaryButton,
-          activeColorAlternate: CustomColors.colorPrimaryWhite,
-          inactiveColor: Colors.grey),
+          activeColorPrimary: CustomColors.colorPrimaryButton,
+          activeColorSecondary: CustomColors.colorPrimaryWhite,
+          inactiveColorPrimary: Colors.grey),
       PersistentBottomNavBarItem(
           icon: Icon(Icons.email),
           title: ("Messages"),
-          activeColor: CustomColors.colorPrimaryButton,
-          activeColorAlternate: CustomColors.colorPrimaryWhite,
-          inactiveColor: Colors.grey),
+          activeColorPrimary: CustomColors.colorPrimaryButton,
+          activeColorSecondary: CustomColors.colorPrimaryWhite,
+          inactiveColorPrimary: Colors.grey),
     ];
   }
 }
