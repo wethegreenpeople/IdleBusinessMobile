@@ -187,16 +187,14 @@ Future<List<Business>> fetchLeaderboard([bool retry]) async {
     });
 
     if (response.statusCode == 200) {
-      // If the server did return a 200 OK response,
-      // then parse the JSON.
-      var businessList = List<Business>();
+      var businessList = <Business>[];
       var responseJson = json.decode(response.body);
       for (var i = 0; i < 3; ++i) {
         businessList.add(Business.fromJson(responseJson[i]));
       }
       return businessList;
     } else if (response.statusCode == 401) {
-      if (!retry) {
+      if (retry) {
         Auth.saveNewToken();
         return fetchLeaderboard(false);
       }
@@ -204,6 +202,51 @@ Future<List<Business>> fetchLeaderboard([bool retry]) async {
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
+      throw Exception('Failed to load business');
+    }
+  } catch (Exception) {
+    return null;
+  }
+}
+
+Future<List<Business>> fetchRandomBusinesses([bool retry]) async {
+  bool _certificateCheck(X509Certificate cert, String host, int port) => true;
+
+  http.Client client() {
+    var ioClient = new HttpClient()..badCertificateCallback = _certificateCheck;
+    return new IOClient(ioClient);
+  }
+
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString("token");
+    var amountOfResults = 3;
+
+    final queryParams = {
+      "amountOfBusinesses": amountOfResults.toString(),
+    };
+    var url = Uri.https(
+        StoreConfig.apiUrl, '/api/business/randombusiness', queryParams);
+    final response = await client().get(url, headers: {
+      "Authorization": "Bearer $token",
+    });
+
+    if (response.statusCode == 200) {
+      var businessList = <Business>[];
+      var responseJson = json.decode(response.body);
+      for (var i = 0; i < amountOfResults; ++i) {
+        var business = Business.fromJson(responseJson[i]);
+        if (business.name != null || business.name != "null")
+          businessList.add(business);
+      }
+      return businessList;
+    } else if (response.statusCode == 401) {
+      if (retry) {
+        Auth.saveNewToken();
+        return fetchRandomBusinesses(false);
+      }
+      return null;
+    } else {
       throw Exception('Failed to load business');
     }
   } catch (Exception) {

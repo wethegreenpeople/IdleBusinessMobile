@@ -47,12 +47,19 @@ class _DirectoryPageState extends State<DirectoryPage> {
           title: new Text('Business Directory'),
         ),
         backgroundColor: CustomColors.colorPrimaryBlue,
-        body: ListView(
-          children: <Widget>[
-            myBusinessCard(),
-            topBusinesses(),
-            searchForBusinessCard()
-          ],
+        body: RefreshIndicator(
+          onRefresh: () async {
+            setState(() {});
+            return;
+          },
+          child: ListView(
+            children: <Widget>[
+              myBusinessCard(),
+              topBusinesses(),
+              searchForBusinessCard(),
+              randomBusinesses()
+            ],
+          ),
         ));
   }
 
@@ -95,6 +102,43 @@ class _DirectoryPageState extends State<DirectoryPage> {
           ),
         )
       ],
+    );
+  }
+
+  Widget randomBusinesses() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(0, 0, 0, 15),
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+            child: Card(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                      title: Text(
+                    "Take a look at...",
+                    style: TextStyle(
+                      fontSize: 18.0.sp,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  )),
+                  FutureBuilder(
+                    future: _viewModel.getRandomBusinesses(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return randomBusinessCardsFromList(snapshot.data);
+                      }
+                      return CircularProgressIndicator();
+                    },
+                  )
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 
@@ -226,7 +270,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
 
   Widget leaderboardCardsFromList(List<Business> businessesList) {
     if (businessesList == null || businessesList.isEmpty) return null;
-    var widgets = new List<Widget>();
+    var widgets = <Widget>[];
 
     businessesList.forEach((element) {
       widgets.add(Card(
@@ -247,6 +291,51 @@ class _DirectoryPageState extends State<DirectoryPage> {
                       style: TextStyle(color: Colors.grey),
                       text: NumberFormat.decimalPattern()
                           .format(element.businessScore)),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ));
+    });
+
+    return ListView(
+      shrinkWrap: true,
+      children: widgets,
+    );
+  }
+
+  Widget randomBusinessCardsFromList(List<Business> businessesList) {
+    if (businessesList == null || businessesList.isEmpty) return null;
+    var widgets = <Widget>[];
+
+    businessesList.forEach((element) {
+      widgets.add(Card(
+        child: InkWell(
+          onTap: () {
+            _viewModel.navigateToBusiness(context, element.id);
+          },
+          child: ListTile(
+            title: Text(element.name.toString()),
+            subtitle: RichText(
+              text: TextSpan(
+                children: [
+                  WidgetSpan(
+                    child: Icon(Icons.attach_money, size: 15),
+                  ),
+                  TextSpan(
+                      style: TextStyle(color: Colors.grey),
+                      text: NumberFormat.compact().format(element.cash)),
+                  WidgetSpan(
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                      child: Icon(Icons.schedule, size: 15),
+                    ),
+                  ),
+                  TextSpan(
+                      style: TextStyle(color: Colors.grey),
+                      text:
+                          NumberFormat.compact().format(element.cashPerSecond)),
                 ],
               ),
             ),

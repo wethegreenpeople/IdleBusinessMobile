@@ -15,6 +15,15 @@ class DirectoryVM {
     }
   }
 
+  Future<List<Business>> getRandomBusinesses() async {
+    try {
+      final businesses = await fetchRandomBusinesses();
+      return businesses;
+    } catch (Exception) {
+      return null;
+    }
+  }
+
   void navigateToBusiness(BuildContext context, int businessId) async {
     await pushNewScreen(
       context,
