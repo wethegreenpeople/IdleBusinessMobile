@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:idlebusiness_mobile/Models/Message.dart';
 import 'package:idlebusiness_mobile/Views/PurchaseAssets/CustomColors.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'MessagesVM.dart';
 import 'package:sizer/sizer.dart';
 
@@ -40,8 +41,16 @@ class _MessagesPageState extends State<MessagesPage> {
                               SingleChildScrollView(
                                 child: Container(
                                   height: 78.0.h,
-                                  child: ListView(
-                                    children: [...messagesCards(snapshot.data)],
+                                  child: RefreshIndicator(
+                                    onRefresh: () async {
+                                      setState(() {});
+                                      return;
+                                    },
+                                    child: ListView(
+                                      children: [
+                                        ...messagesCards(snapshot.data)
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
@@ -68,7 +77,9 @@ class _MessagesPageState extends State<MessagesPage> {
           Expanded(
             child: Card(
                 child: ListTile(
-              leading: Icon(Icons.email),
+              leading: element.read
+                  ? Icon(MdiIcons.email)
+                  : Icon(MdiIcons.emailOpen),
               title: Text(element.messageBody),
             )),
           ),
