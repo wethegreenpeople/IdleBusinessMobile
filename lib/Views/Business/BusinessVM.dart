@@ -83,7 +83,8 @@ class BusinessVM {
 
     var result = 0;
     result =
-        (_viewingBusiness.espionageChance - _viewedBusiness.espionageDefense)
+        ((_viewingBusiness.espionageChance - _viewedBusiness.espionageDefense) *
+                100)
             .toInt();
     if (result < 0)
       return 0;
