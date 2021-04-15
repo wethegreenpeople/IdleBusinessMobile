@@ -1,5 +1,6 @@
 import 'package:idlebusiness_mobile/Models/ApiResponse.dart';
 import 'package:idlebusiness_mobile/Stores/BusinessStore.dart';
+import 'package:idlebusiness_mobile/Stores/PurchasableStore.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -7,6 +8,8 @@ class BusinessVM {
   Business _viewingBusiness;
   Business _viewedBusiness;
   int _viewedBusinessId;
+  int _viewingBusinessId;
+  List<Purchasable> _viewingBusinessPurchasablesItems;
 
   String get viewedBusinessName {
     return _viewedBusiness.name;
@@ -18,26 +21,48 @@ class BusinessVM {
         .toString();
   }
 
-  BusinessVM(int viewedBusinessId) {
-    _viewedBusinessId = viewedBusinessId;
-    _getViewingAndViewedBusinesses(viewedBusinessId);
+  bool get viewingOwnBusiness {
+    return _viewingBusinessId == _viewedBusinessId;
   }
 
-  Future<void> _getViewingAndViewedBusinesses(int viewedBusinessId) async {
-    var viewingBusinessId = 0;
-    await SharedPreferences.getInstance().then((value) =>
-        viewingBusinessId = int.parse(value.getString('businessId')));
+  bool get canViewInvestments {
+    return viewingOwnBusiness ||
+        _viewingBusinessPurchasablesItems.any(
+            (element) => element.id == 28 && element.amountOwnedByBusiness > 0);
+  }
+
+  bool get canViewEspionages {
+    return viewingOwnBusiness ||
+        _viewingBusinessPurchasablesItems.any(
+            (element) => element.id == 32 && element.amountOwnedByBusiness > 0);
+  }
+
+  BusinessVM(int viewingBusinessId, int viewedBusinessId) {
+    _viewedBusinessId = viewedBusinessId;
+    _viewingBusinessId = viewingBusinessId;
+    _getViewingAndViewedBusinesses(viewedBusinessId, viewingBusinessId);
+    _getViewingBusinessPurchases(viewingBusinessId);
+  }
+
+  Future<void> _getViewingAndViewedBusinesses(
+      int viewedBusinessId, int viewingBusinessId) async {
     await getBusiness(viewingBusinessId)
         .then((value) => _viewingBusiness = value);
     await getBusiness(viewedBusinessId)
         .then((value) => _viewedBusiness = value);
   }
 
+  Future<void> _getViewingBusinessPurchases(int viewingBusinessId) async {
+    _viewingBusinessPurchasablesItems =
+        await fetchPurchasables(_viewingBusinessId.toString(), "2");
+  }
+
   Future<bool> _ensureBusinessesArePopulated() async {
     var areBusinessesPopulated =
         (_viewedBusiness == null && _viewingBusiness == null);
     if (!areBusinessesPopulated)
-      await _getViewingAndViewedBusinesses(_viewedBusinessId);
+      await _getViewingAndViewedBusinesses(
+          _viewedBusinessId, _viewedBusinessId);
     return areBusinessesPopulated;
   }
 

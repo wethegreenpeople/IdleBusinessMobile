@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:idlebusiness_mobile/Models/ApiResponse.dart';
 import 'package:idlebusiness_mobile/Models/Investment.dart';
 import 'package:idlebusiness_mobile/Stores/BusinessStore.dart';
 import 'package:idlebusiness_mobile/Views/Business/BusinessVM.dart';
@@ -10,22 +9,26 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:sizer/sizer.dart';
 
 class BusinessPage extends StatefulWidget {
-  final int _businessId;
+  final int _viewingBusinessId;
+  final int _viewedBusinessId;
 
-  BusinessPage(this._businessId);
+  BusinessPage(this._viewingBusinessId, this._viewedBusinessId);
 
   @override
-  State<StatefulWidget> createState() => new _BusinessPageState(_businessId);
+  State<StatefulWidget> createState() =>
+      new _BusinessPageState(_viewingBusinessId, _viewedBusinessId);
 }
 
 class _BusinessPageState extends State<BusinessPage> {
-  int _businessId;
+  int _viewingBusinessId;
+  int _viewedBusinessId;
   BusinessVM _viewModel;
   var investmentAmountController = TextEditingController();
 
-  _BusinessPageState(int businessId) {
-    _viewModel = BusinessVM(businessId);
-    _businessId = businessId;
+  _BusinessPageState(int viewingBusinessId, int viewedBusinessId) {
+    _viewModel = BusinessVM(viewingBusinessId, viewedBusinessId);
+    _viewingBusinessId = viewingBusinessId;
+    _viewedBusinessId = viewedBusinessId;
   }
 
   @override
@@ -314,14 +317,16 @@ class _BusinessPageState extends State<BusinessPage> {
 
   Widget businessInfoTabBarChild() {
     return FutureBuilder<Business>(
-        future: _viewModel.getBusiness(_businessId),
+        future: _viewModel.getBusiness(_viewedBusinessId),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return ListView(
               children: <Widget>[
                 businessInfoCard(snapshot.data),
-                businessInvestments(snapshot.data),
-                businessEspionages(snapshot.data),
+                if (_viewModel.canViewInvestments)
+                  businessInvestments(snapshot.data),
+                if (_viewModel.canViewEspionages)
+                  businessEspionages(snapshot.data),
               ],
             );
           }
@@ -413,7 +418,7 @@ class _BusinessPageState extends State<BusinessPage> {
 
   Widget investInBusinessTabBarChild() {
     return FutureBuilder(
-        future: _viewModel.getBusiness(this._businessId),
+        future: _viewModel.getBusiness(this._viewedBusinessId),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return ListView(
@@ -541,7 +546,7 @@ class _BusinessPageState extends State<BusinessPage> {
 
   Widget espionageBusinessTabBarChild() {
     return FutureBuilder(
-        future: _viewModel.getBusiness(this._businessId),
+        future: _viewModel.getBusiness(this._viewedBusinessId),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return ListView(

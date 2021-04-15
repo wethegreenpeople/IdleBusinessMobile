@@ -147,41 +147,45 @@ class _DirectoryPageState extends State<DirectoryPage> {
       children: [
         Padding(
           padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-          child: Card(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                this.business == null
-                    ? _showCircularProgress()
-                    : ListTile(
-                        title: Text(
-                        this.business?.name ?? "",
-                        style: TextStyle(
-                          fontSize: 18.0.sp,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      )),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Card(
-                          child: ListTile(
-                              leading: Icon(Icons.account_balance),
-                              title: Text(NumberFormat.compact().format(
-                                  this.business?.lifeTimeEarnings ?? 0)),
-                              subtitle: Text('Life Time'))),
-                    ),
-                    Expanded(
-                      child: Card(
-                          child: ListTile(
-                              leading: Icon(Icons.score),
-                              title: Text(NumberFormat.compact()
-                                  .format(this.business?.businessScore ?? 0)),
-                              subtitle: Text('Score'))),
-                    )
-                  ],
-                ),
-              ],
+          child: InkWell(
+            onTap: () => _viewModel.navigateToBusiness(
+                context, this.business.id, this.business.id),
+            child: Card(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  this.business == null
+                      ? _showCircularProgress()
+                      : ListTile(
+                          title: Text(
+                          this.business?.name ?? "",
+                          style: TextStyle(
+                            fontSize: 18.0.sp,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        )),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Card(
+                            child: ListTile(
+                                leading: Icon(Icons.account_balance),
+                                title: Text(NumberFormat.compact().format(
+                                    this.business?.lifeTimeEarnings ?? 0)),
+                                subtitle: Text('Life Time'))),
+                      ),
+                      Expanded(
+                        child: Card(
+                            child: ListTile(
+                                leading: Icon(Icons.score),
+                                title: Text(NumberFormat.compact()
+                                    .format(this.business?.businessScore ?? 0)),
+                                subtitle: Text('Score'))),
+                      )
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         )
@@ -234,7 +238,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
                                   _viewModel.searchForBusinessController.text);
                               if (result != null) {
                                 _viewModel.navigateToBusiness(
-                                    context, result.id);
+                                    context, this.business.id, result.id);
                               } else {
                                 showDialog(
                                     context: context,
@@ -276,7 +280,8 @@ class _DirectoryPageState extends State<DirectoryPage> {
       widgets.add(Card(
         child: InkWell(
           onTap: () {
-            _viewModel.navigateToBusiness(context, element.id);
+            _viewModel.navigateToBusiness(
+                context, this.business.id, element.id);
           },
           child: ListTile(
             leading: Icon(MdiIcons.trophyVariant),
@@ -313,7 +318,8 @@ class _DirectoryPageState extends State<DirectoryPage> {
       widgets.add(Card(
         child: InkWell(
           onTap: () {
-            _viewModel.navigateToBusiness(context, element.id);
+            _viewModel.navigateToBusiness(
+                context, this.business.id, element.id);
           },
           child: ListTile(
             title: Text(element.name.toString()),

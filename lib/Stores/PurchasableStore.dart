@@ -109,24 +109,27 @@ class Purchasable {
   String description;
   bool isSinglePurchase;
   bool isGlobalPurchase;
+  bool isUpgrade;
+  int purchasableUpgradeId;
 
-  Purchasable({
-    this.id,
-    this.name,
-    this.cost,
-    this.cashPerSecondMod,
-    this.amountOwnedByBusiness,
-    this.perOwnedMod,
-    this.maxEmployeeMod,
-    this.espionageChanceMod,
-    this.espionageDefenseMod,
-    this.maxItemsMod,
-    this.unlocksAtTotalEarnings,
-    this.purchasableTypeId,
-    this.description,
-    this.isSinglePurchase,
-    this.isGlobalPurchase,
-  });
+  Purchasable(
+      {this.id,
+      this.name,
+      this.cost,
+      this.cashPerSecondMod,
+      this.amountOwnedByBusiness,
+      this.perOwnedMod,
+      this.maxEmployeeMod,
+      this.espionageChanceMod,
+      this.espionageDefenseMod,
+      this.maxItemsMod,
+      this.unlocksAtTotalEarnings,
+      this.purchasableTypeId,
+      this.description,
+      this.isSinglePurchase,
+      this.isGlobalPurchase,
+      this.isUpgrade,
+      this.purchasableUpgradeId});
 
   double calculateAdjustedCost() {
     return cost * pow((1 + perOwnedMod), amountOwnedByBusiness);
@@ -148,7 +151,9 @@ class Purchasable {
         purchasableTypeId: json['Purchasable']['PurchasableTypeId'],
         description: json['Purchasable']['Description'],
         isSinglePurchase: json['Purchasable']['IsSinglePurchase'],
-        isGlobalPurchase: json['Purchasable']['IsGlobalPurchase']);
+        isGlobalPurchase: json['Purchasable']['IsGlobalPurchase'],
+        isUpgrade: json['Purchasable']['IsUpgrade'],
+        purchasableUpgradeId: json['Purchasable']['PurchasableUpgradeId']);
   }
 
   static BusinessPurchase fromPurchaseResponse(dynamic json) {

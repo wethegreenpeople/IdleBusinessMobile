@@ -74,7 +74,7 @@ class _PurchasableCardsState extends State<PurchasableCards> {
     var widgets = new List<Widget>();
 
     purchasableList.forEach((element) {
-      if (isItemVisible(element, this.viewModel.business)) {
+      if (isItemVisible(element, purchasableList, this.viewModel.business)) {
         widgets.add(Container(
             width: MediaQuery.of(context).size.width * .5,
             child: Card(
@@ -108,8 +108,20 @@ class _PurchasableCardsState extends State<PurchasableCards> {
     return true;
   }
 
-  bool isItemVisible(Purchasable purchasable, Business business) {
-    return business.lifeTimeEarnings >= purchasable.unlocksAtTotalEarnings;
+  bool isItemVisible(Purchasable purchasable, List<Purchasable> allPurchasables,
+      Business business) {
+    var lifeTimeEarningsUnlocked =
+        business.lifeTimeEarnings >= purchasable.unlocksAtTotalEarnings;
+    var isUpgradeWithPreviousPurchased = (purchasable.isUpgrade &&
+        allPurchasables.any((element) =>
+            element.purchasableUpgradeId == purchasable.id &&
+            element.amountOwnedByBusiness == 0));
+    var alreadyPurchasedUpgrade = (purchasable.purchasableUpgradeId != 0 &&
+        purchasable.amountOwnedByBusiness > 0);
+
+    return lifeTimeEarningsUnlocked &&
+        !isUpgradeWithPreviousPurchased &&
+        !alreadyPurchasedUpgrade;
   }
 
   Widget clickableCard(Purchasable purchasable) {

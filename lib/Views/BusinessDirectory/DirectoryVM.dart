@@ -24,10 +24,11 @@ class DirectoryVM {
     }
   }
 
-  void navigateToBusiness(BuildContext context, int businessId) async {
+  void navigateToBusiness(
+      BuildContext context, int viewingBusinessId, int viewedBusinessId) async {
     await pushNewScreen(
       context,
-      screen: BusinessPage(businessId),
+      screen: BusinessPage(viewingBusinessId, viewedBusinessId),
       withNavBar: false,
       pageTransitionAnimation: PageTransitionAnimation.cupertino,
     );
