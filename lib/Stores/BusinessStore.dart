@@ -10,6 +10,45 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'StoreConfig.dart';
 
 class BusinessStore {
+  Future<ApiResponse> joinBusinessSector(int businessId, int sectorId,
+      {bool retry}) async {
+    bool _certificateCheck(X509Certificate cert, String host, int port) => true;
+
+    http.Client client() {
+      var ioClient = new HttpClient()
+        ..badCertificateCallback = _certificateCheck;
+      return new IOClient(ioClient);
+    }
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString("token");
+
+      final queryParams = {
+        "businessId": businessId.toString(),
+        "sectorId": sectorId.toString(),
+      };
+      var url = Uri.https(
+          StoreConfig.apiUrl, '/api/business/joinsector', queryParams);
+      final response = await client().post(url, headers: {
+        "Authorization": "Bearer $token",
+      });
+
+      if (response.statusCode == 200) {
+        // If the server did return a 200 OK response,
+        // then parse the JSON.
+        return ApiResponse(true, "");
+      } else if (response.statusCode == 401 && retry) {
+        Auth.saveNewToken();
+        return joinBusinessSector(businessId, sectorId, retry: false);
+      } else {
+        return ApiResponse(false, response.body);
+      }
+    } catch (Exception) {
+      return null;
+    }
+  }
+
   Future<ApiResponse> investInBusiness(
       int investingBusinessId, int investedBusinessId, double investmentAmount,
       {bool retry}) async {
@@ -354,6 +393,7 @@ class Business {
   double espionageCost;
   List<Investment> investments;
   List<Investment> espionages;
+  int sectorId;
 
   Business(
       {this.id,
@@ -370,7 +410,8 @@ class Business {
       double businessScore,
       double espionageCost,
       List<Investment> investments,
-      List<Investment> espionages}) {
+      List<Investment> espionages,
+      int sectorId}) {
     this.cash = cash;
     this.cashPerSecond = cashPerSecond;
     this.lifeTimeEarnings = lifeTimeEarnings;
@@ -384,6 +425,7 @@ class Business {
     this.espionageCost = espionageCost;
     this.investments = investments;
     this.espionages = espionages;
+    this.sectorId = sectorId;
   }
 
   factory Business.fromJson(Map<String, dynamic> json) {
@@ -441,6 +483,7 @@ class Business {
         amountOwnedItems: json['AmountOwnedItems'],
         businessScore: json['BusinessScore'],
         espionageCost: json['EspionageCost'],
+        sectorId: json['Sector'] != null ? json['Sector']['Id'] : null,
         investments: getInvestmentsFromJson(json),
         espionages: getEspionagesFromJson(json));
   }

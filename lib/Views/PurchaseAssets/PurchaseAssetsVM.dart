@@ -1,11 +1,13 @@
 import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:idlebusiness_mobile/Helpers/AppHelper.dart';
 import 'package:idlebusiness_mobile/Stores/BusinessStore.dart';
 import 'package:idlebusiness_mobile/Stores/PurchasableStore.dart';
 import 'package:idlebusiness_mobile/Views/Login/Login.dart';
+import 'package:idlebusiness_mobile/Views/PurchaseAssets/CustomColors.dart';
+import 'package:idlebusiness_mobile/Views/Sector/Sector.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,7 +18,32 @@ class PurchaseAssetsVM extends ChangeNotifier {
   int _purchaseAmount = 0; // Keep track of how many purchases we make in one go
   Timer _cashIncreaseTimer; // Timer to track our cash increase per second
 
-  PurchaseAssetsVM(this.business);
+  PurchaseAssetsVM(BuildContext context, this.business) {
+    if (this.business != null &&
+        this.business.sectorId == null &&
+        this.business.lifeTimeEarnings >= 10000000) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        var okButton = TextButton(
+          child: Text(
+            "Join Now",
+            style: TextStyle(color: CustomColors.colorPrimaryButton),
+          ),
+          onPressed: () {
+            _pushSectorScreen(context);
+          },
+        );
+
+        showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                  title: Text('!!!'),
+                  content: Text(
+                      "Congrats! Your business is large enough to join a sector. Join now?"),
+                  actions: [okButton],
+                ));
+      });
+    }
+  }
 
   void purchaseAsset(Purchasable purchasable) {
     _purchaseAmount++;
@@ -74,6 +101,15 @@ class PurchaseAssetsVM extends ChangeNotifier {
     await pushNewScreen(
       context,
       screen: LoginPage(),
+      withNavBar: false,
+      pageTransitionAnimation: PageTransitionAnimation.cupertino,
+    );
+  }
+
+  Future<void> _pushSectorScreen(BuildContext context) async {
+    await pushNewScreen(
+      context,
+      screen: SectorPage(this.business),
       withNavBar: false,
       pageTransitionAnimation: PageTransitionAnimation.cupertino,
     );

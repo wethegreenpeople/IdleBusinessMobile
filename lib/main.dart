@@ -1,7 +1,6 @@
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:idlebusiness_mobile/Views/Login/Login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Helpers/LifeCycleHelper.dart';

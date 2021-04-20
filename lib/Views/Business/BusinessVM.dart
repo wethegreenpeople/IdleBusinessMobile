@@ -2,7 +2,6 @@ import 'package:idlebusiness_mobile/Models/ApiResponse.dart';
 import 'package:idlebusiness_mobile/Stores/BusinessStore.dart';
 import 'package:idlebusiness_mobile/Stores/PurchasableStore.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class BusinessVM {
   Business _viewingBusiness;

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:idlebusiness_mobile/Models/BusinessInfoType.dart';
-import 'package:idlebusiness_mobile/Views/Login/Login.dart';
 import 'package:idlebusiness_mobile/Views/PurchaseAssets/BusinessInfo.dart';
 import 'package:idlebusiness_mobile/Views/PurchaseAssets/PurchasableCards.dart';
 import 'package:idlebusiness_mobile/Views/PurchaseAssets/PurchaseAssetsVM.dart';
@@ -102,12 +101,12 @@ class _PurchaseAssetsState extends State<PurchaseAssets> {
                 ],
               ),
             ),
-            body: FutureBuilder(
+            body: FutureBuilder<Business>(
               future: _getBusiness(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   if (viewModel == null)
-                    viewModel = PurchaseAssetsVM(snapshot.data);
+                    viewModel = PurchaseAssetsVM(context, snapshot.data);
                   if (_businessInfo == null)
                     _businessInfo = BusinessInfo(
                       viewModel: this.viewModel,
