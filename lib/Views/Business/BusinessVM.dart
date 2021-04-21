@@ -61,7 +61,7 @@ class BusinessVM {
         (_viewedBusiness == null && _viewingBusiness == null);
     if (!areBusinessesPopulated)
       await _getViewingAndViewedBusinesses(
-          _viewedBusinessId, _viewedBusinessId);
+          _viewedBusinessId, _viewingBusinessId);
     return areBusinessesPopulated;
   }
 
