@@ -132,6 +132,47 @@ class BusinessStore {
       return null;
     }
   }
+
+  Future<ApiResponse> attemptTheftOnBusiness(
+      int attackingBusinessId, int defendingBusinessId,
+      {bool retry}) async {
+    bool _certificateCheck(X509Certificate cert, String host, int port) => true;
+
+    http.Client client() {
+      var ioClient = new HttpClient()
+        ..badCertificateCallback = _certificateCheck;
+      return new IOClient(ioClient);
+    }
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString("token");
+
+      final queryParams = {
+        "attackingBusinessId": attackingBusinessId.toString(),
+        "defendingBusinessId": defendingBusinessId.toString(),
+      };
+      var url =
+          Uri.https(StoreConfig.apiUrl, '/api/business/theft', queryParams);
+      final response = await client().post(url, headers: {
+        "Authorization": "Bearer $token",
+      });
+
+      if (response.statusCode == 200) {
+        if (response.body == "Unsuccessful Theft")
+          return ApiResponse(false, "Failed to espionage business");
+        return ApiResponse(true, response.body);
+      } else if (response.statusCode == 401 && retry) {
+        Auth.saveNewToken();
+        return attemptTheftOnBusiness(attackingBusinessId, defendingBusinessId,
+            retry: false);
+      } else {
+        return ApiResponse(false, response.body);
+      }
+    } catch (Exception) {
+      return null;
+    }
+  }
 }
 
 Future<Business> fetchBusiness(String businessId) async {

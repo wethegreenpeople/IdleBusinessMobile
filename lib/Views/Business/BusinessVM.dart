@@ -36,6 +36,11 @@ class BusinessVM {
             (element) => element.id == 32 && element.amountOwnedByBusiness > 0);
   }
 
+  bool get canAttemptTheft {
+    return _viewingBusinessPurchasablesItems.any(
+        (element) => element.id == 35 && element.amountOwnedByBusiness > 0);
+  }
+
   BusinessVM(int viewingBusinessId, int viewedBusinessId) {
     _viewedBusinessId = viewedBusinessId;
     _viewingBusinessId = viewingBusinessId;
@@ -91,6 +96,13 @@ class BusinessVM {
     return response;
   }
 
+  Future<ApiResponse> attemptTheftOnBusiness() async {
+    await _ensureBusinessesArePopulated();
+    var response = await BusinessStore()
+        .attemptTheftOnBusiness(_viewingBusiness.id, _viewedBusiness.id);
+    return response;
+  }
+
   Future<int> getEspionageSuccessChance() async {
     await _ensureBusinessesArePopulated();
     var successChance = 0;
@@ -116,5 +128,16 @@ class BusinessVM {
       return 50;
     else
       return result;
+  }
+
+  Future<int> getTheftSuccessChance() async {
+    await _ensureBusinessesArePopulated();
+    var successChance = 0;
+
+    successChance = ((_viewingBusiness.espionageChance -
+                (_viewedBusiness.espionageDefense * .85)) *
+            100)
+        .toInt();
+    return successChance;
   }
 }
