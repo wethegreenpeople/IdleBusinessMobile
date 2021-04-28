@@ -652,6 +652,114 @@ class _BusinessPageState extends State<BusinessPage> {
     );
   }
 
+  Widget attemptArsonBusinessCard() {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+          child: Card(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                    title: Text(
+                      "Arson",
+                      style: TextStyle(
+                        fontSize: 18.0.sp,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    isThreeLine: true,
+                    subtitle: FutureBuilder(
+                      future: _viewModel.getArsonSuccessChance(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) return SizedBox();
+                        return RichText(
+                          text: TextSpan(children: [
+                            TextSpan(
+                                text: "Chance of success: ",
+                                style: TextStyle(color: Colors.grey)),
+                            TextSpan(
+                                text: "${snapshot.data}%\n",
+                                style: TextStyle(
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.bold)),
+                            TextSpan(
+                                text: "Cost of arson: ",
+                                style: TextStyle(color: Colors.grey)),
+                            TextSpan(
+                                text:
+                                    "${_viewModel.viewingBusinessEspionageCost}\n\n",
+                                style: TextStyle(
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.bold)),
+                            TextSpan(
+                                text:
+                                    "If arson is successful you will remove between ",
+                                style: TextStyle(color: Colors.grey)),
+                            TextSpan(
+                                text: "10 - 40 ",
+                                style: TextStyle(
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.bold)),
+                            TextSpan(
+                                text:
+                                    "of ${_viewModel.viewedBusinessName}'s max employee amount. ",
+                                style: TextStyle(color: Colors.grey)),
+                            TextSpan(
+                                text:
+                                    "${_viewModel.viewedBusinessName} will also gain ",
+                                style: TextStyle(color: Colors.grey)),
+                            TextSpan(
+                                text: "5% ",
+                                style: TextStyle(
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.bold)),
+                            TextSpan(
+                                text: "espionage defense. ",
+                                style: TextStyle(color: Colors.grey)),
+                          ]),
+                        );
+                      },
+                    )),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding:
+                            EdgeInsets.fromLTRB(10.0.w, 1.0.h, 10.0.w, 1.0.h),
+                        child: ElevatedButton(
+                            onPressed: () async {
+                              var result =
+                                  await _viewModel.attemptArsonOnBusiness();
+                              if (result.success) {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                        title: Text('Success!'),
+                                        content: Text(result.returnValue)));
+                              } else {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                          title: Text(':('),
+                                          content: Text(result.returnValue),
+                                        ));
+                              }
+                            },
+                            child: Text('Attempt Arson')),
+                      ),
+                    )
+                  ],
+                )
+              ],
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
   Widget espionageBusinessTabBarChild() {
     return FutureBuilder(
         future: _viewModel.getBusiness(this._viewedBusinessId),
@@ -661,7 +769,8 @@ class _BusinessPageState extends State<BusinessPage> {
               children: <Widget>[
                 businessInfoCard(snapshot.data),
                 espionageBusinessCard(),
-                if (_viewModel.canAttemptTheft) attemptTheftBusinessCard()
+                if (_viewModel.canAttemptTheft) attemptTheftBusinessCard(),
+                if (_viewModel.canAttemptArson) attemptArsonBusinessCard(),
               ],
             );
           }
