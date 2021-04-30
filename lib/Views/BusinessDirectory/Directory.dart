@@ -4,6 +4,7 @@ import 'package:idlebusiness_mobile/Stores/BusinessStore.dart';
 import 'package:idlebusiness_mobile/Views/BusinessDirectory/DirectoryVM.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../PurchaseAssets/CustomColors.dart';
 import 'package:sizer/sizer.dart';
@@ -28,6 +29,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
       var businessId = value.getString('businessId');
       Business().getBusiness(businessId).then((value) {
         this.business = value;
+        _viewModel.currentBusiness = value;
         setState(() {});
       });
     });
@@ -49,6 +51,8 @@ class _DirectoryPageState extends State<DirectoryPage> {
         backgroundColor: CustomColors.colorPrimaryBlue,
         body: RefreshIndicator(
           onRefresh: () async {
+            _viewModel.currentBusiness =
+                await _viewModel.updateCurrentBusiness();
             setState(() {});
             return;
           },
@@ -143,53 +147,62 @@ class _DirectoryPageState extends State<DirectoryPage> {
   }
 
   Widget myBusinessCard() {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-          child: InkWell(
-            onTap: () => _viewModel.navigateToBusiness(
-                context, this.business.id, this.business.id),
-            child: Card(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  this.business == null
-                      ? _showCircularProgress()
-                      : ListTile(
-                          title: Text(
-                          this.business?.name ?? "",
-                          style: TextStyle(
-                            fontSize: 18.0.sp,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        )),
-                  Row(
+    return ChangeNotifierProvider(
+      create: (context) => _viewModel,
+      child: Consumer<DirectoryVM>(builder: (_, model, __) {
+        return Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+              child: InkWell(
+                onTap: () => _viewModel.navigateToBusiness(
+                    context, this.business.id, this.business.id),
+                child: Card(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Expanded(
-                        child: Card(
-                            child: ListTile(
-                                leading: Icon(Icons.account_balance),
-                                title: Text(NumberFormat.compact().format(
-                                    this.business?.lifeTimeEarnings ?? 0)),
-                                subtitle: Text('Life Time'))),
+                      this.business == null
+                          ? _showCircularProgress()
+                          : ListTile(
+                              title: Text(
+                              this.business?.name ?? "",
+                              style: TextStyle(
+                                fontSize: 18.0.sp,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            )),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Card(
+                                child: ListTile(
+                                    leading: Icon(Icons.account_balance),
+                                    title: Text(NumberFormat.compact().format(
+                                        _viewModel.currentBusiness
+                                                .lifeTimeEarnings ??
+                                            0)),
+                                    subtitle: Text('Life Time'))),
+                          ),
+                          Expanded(
+                            child: Card(
+                                child: ListTile(
+                                    leading: Icon(Icons.score),
+                                    title: Text(NumberFormat.compact().format(
+                                        _viewModel.currentBusiness
+                                                .businessScore ??
+                                            0)),
+                                    subtitle: Text('Score'))),
+                          )
+                        ],
                       ),
-                      Expanded(
-                        child: Card(
-                            child: ListTile(
-                                leading: Icon(Icons.score),
-                                title: Text(NumberFormat.compact()
-                                    .format(this.business?.businessScore ?? 0)),
-                                subtitle: Text('Score'))),
-                      )
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
-        )
-      ],
+            )
+          ],
+        );
+      }),
     );
   }
 

@@ -3,8 +3,22 @@ import 'package:idlebusiness_mobile/Stores/BusinessStore.dart';
 import 'package:idlebusiness_mobile/Views/Business/Business.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 
-class DirectoryVM {
+class DirectoryVM extends ChangeNotifier {
   var searchForBusinessController = TextEditingController();
+
+  Business _currentBusiness;
+  Business get currentBusiness {
+    return _currentBusiness;
+  }
+
+  set currentBusiness(Business value) {
+    _currentBusiness = value;
+    notifyListeners();
+  }
+
+  Future<Business> updateCurrentBusiness() async {
+    return await fetchBusiness(currentBusiness.id.toString());
+  }
 
   Future<Business> searchForBusiness(String businessName) async {
     try {

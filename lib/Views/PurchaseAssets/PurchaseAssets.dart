@@ -72,135 +72,140 @@ class _PurchaseAssetsState extends State<PurchaseAssets> {
         if (snapshot.hasData) {
           return ChangeNotifierProvider(
             create: (context) => viewModel,
-            child: DefaultTabController(
-              length: viewModel.canViewMarketplace ? 4 : 3,
-              child: Scaffold(
-                  backgroundColor: CustomColors.colorPrimaryBlue,
-                  appBar: AppBar(
-                    title: Text("Purchase Assets"),
-                    backgroundColor: CustomColors.colorPrimaryBlueAccent,
-                    bottom: TabBar(labelPadding: EdgeInsets.all(0), tabs: [
-                      Tab(
-                          icon: Icon(Icons.face),
-                          text: "Employees",
-                          iconMargin: EdgeInsets.only(bottom: 5.0)),
-                      Tab(
-                          icon: Icon(Icons.business_center),
-                          text: "Items",
-                          iconMargin: EdgeInsets.only(bottom: 5.0)),
-                      Tab(
-                          icon: Icon(Icons.home),
-                          text: "Real Estate",
-                          iconMargin: EdgeInsets.only(bottom: 5.0)),
-                      if (viewModel.canViewMarketplace)
-                        Tab(
-                            icon: Icon(MdiIcons.store),
-                            text: "Marketplace",
-                            iconMargin: EdgeInsets.only(bottom: 5.0)),
-                    ]),
-                  ),
-                  drawer: Drawer(
-                    child: ListView(
-                      padding: EdgeInsets.zero,
-                      children: <Widget>[
-                        DrawerHeader(
-                            child: SizedBox(),
-                            decoration: BoxDecoration(
-                                color: CustomColors.colorPrimaryBlue)),
-                        ListTile(
-                          title: Text('Log out'),
-                          onTap: () {
-                            setState(() {
-                              viewModel.logOut(context);
-                            });
-                          },
-                        ),
-                        ListTile(
-                          title: Text('Discord'),
-                          onTap: () {
-                            setState(() async {
-                              await canLaunch("https://discord.gg/A8zFrau")
-                                  ? await launch("https://discord.gg/A8zFrau")
-                                  : throw 'Could not launch discord';
-                            });
-                          },
-                        )
-                      ],
-                    ),
-                  ),
-                  body: Center(
-                    child: TabBarView(children: [
-                      Column(
-                        children: <Widget>[
-                          BusinessInfo(
-                            viewModel: this.viewModel,
-                            infoType: BusinessInfoType.cashPerSecond,
-                          ),
-                          FutureBuilder(
-                            future: _getPurchasableCards("1"),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                return snapshot.data;
-                              }
-                              return CircularProgressIndicator();
-                            },
-                          ),
-                        ],
+            child: Consumer<PurchaseAssetsVM>(
+              builder: (_, model, __) {
+                return DefaultTabController(
+                  length: viewModel.canViewMarketplace ? 4 : 3,
+                  child: Scaffold(
+                      backgroundColor: CustomColors.colorPrimaryBlue,
+                      appBar: AppBar(
+                        title: Text("Purchase Assets"),
+                        backgroundColor: CustomColors.colorPrimaryBlueAccent,
+                        bottom: TabBar(labelPadding: EdgeInsets.all(0), tabs: [
+                          Tab(
+                              icon: Icon(Icons.face),
+                              text: "Employees",
+                              iconMargin: EdgeInsets.only(bottom: 5.0)),
+                          Tab(
+                              icon: Icon(Icons.business_center),
+                              text: "Items",
+                              iconMargin: EdgeInsets.only(bottom: 5.0)),
+                          Tab(
+                              icon: Icon(Icons.home),
+                              text: "Real Estate",
+                              iconMargin: EdgeInsets.only(bottom: 5.0)),
+                          if (viewModel.canViewMarketplace)
+                            Tab(
+                                icon: Icon(MdiIcons.store),
+                                text: "Marketplace",
+                                iconMargin: EdgeInsets.only(bottom: 5.0)),
+                        ]),
                       ),
-                      Column(
-                        children: <Widget>[
-                          BusinessInfo(
-                            viewModel: this.viewModel,
-                            infoType: BusinessInfoType.items,
-                          ),
-                          FutureBuilder(
-                            future: _getPurchasableCards("2"),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                return snapshot.data;
-                              }
-                              return CircularProgressIndicator();
-                            },
-                          ),
-                        ],
-                      ),
-                      Column(
-                        children: <Widget>[
-                          BusinessInfo(
-                            viewModel: this.viewModel,
-                            infoType: BusinessInfoType.realEstate,
-                          ),
-                          FutureBuilder(
-                            future: _getPurchasableCards("3"),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                return snapshot.data;
-                              }
-                              return CircularProgressIndicator();
-                            },
-                          ),
-                        ],
-                      ),
-                      if (viewModel.canViewMarketplace)
-                        Column(
+                      drawer: Drawer(
+                        child: ListView(
+                          padding: EdgeInsets.zero,
                           children: <Widget>[
-                            BusinessInfo(
-                              viewModel: this.viewModel,
-                              infoType: BusinessInfoType.cashPerSecond,
-                            ),
-                            FutureBuilder(
-                              future: _getPurchasableCards("4"),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  return snapshot.data;
-                                }
-                                return CircularProgressIndicator();
+                            DrawerHeader(
+                                child: SizedBox(),
+                                decoration: BoxDecoration(
+                                    color: CustomColors.colorPrimaryBlue)),
+                            ListTile(
+                              title: Text('Log out'),
+                              onTap: () {
+                                setState(() {
+                                  viewModel.logOut(context);
+                                });
                               },
                             ),
+                            ListTile(
+                              title: Text('Discord'),
+                              onTap: () {
+                                setState(() async {
+                                  await canLaunch("https://discord.gg/A8zFrau")
+                                      ? await launch(
+                                          "https://discord.gg/A8zFrau")
+                                      : throw 'Could not launch discord';
+                                });
+                              },
+                            )
                           ],
-                        )
-                    ]),
-                  )),
+                        ),
+                      ),
+                      body: Center(
+                        child: TabBarView(children: [
+                          Column(
+                            children: <Widget>[
+                              BusinessInfo(
+                                viewModel: this.viewModel,
+                                infoType: BusinessInfoType.cashPerSecond,
+                              ),
+                              FutureBuilder(
+                                future: _getPurchasableCards("1"),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    return snapshot.data;
+                                  }
+                                  return CircularProgressIndicator();
+                                },
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: <Widget>[
+                              BusinessInfo(
+                                viewModel: this.viewModel,
+                                infoType: BusinessInfoType.items,
+                              ),
+                              FutureBuilder(
+                                future: _getPurchasableCards("2"),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    return snapshot.data;
+                                  }
+                                  return CircularProgressIndicator();
+                                },
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: <Widget>[
+                              BusinessInfo(
+                                viewModel: this.viewModel,
+                                infoType: BusinessInfoType.realEstate,
+                              ),
+                              FutureBuilder(
+                                future: _getPurchasableCards("3"),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    return snapshot.data;
+                                  }
+                                  return CircularProgressIndicator();
+                                },
+                              ),
+                            ],
+                          ),
+                          if (viewModel.canViewMarketplace)
+                            Column(
+                              children: <Widget>[
+                                BusinessInfo(
+                                  viewModel: this.viewModel,
+                                  infoType: BusinessInfoType.cashPerSecond,
+                                ),
+                                FutureBuilder(
+                                  future: _getPurchasableCards("4"),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      return snapshot.data;
+                                    }
+                                    return CircularProgressIndicator();
+                                  },
+                                ),
+                              ],
+                            )
+                        ]),
+                      )),
+                );
+              },
             ),
           );
         }

@@ -19,7 +19,7 @@ class PurchaseAssetsVM extends ChangeNotifier {
   Timer _cashIncreaseTimer; // Timer to track our cash increase per second
 
   bool get canViewMarketplace {
-    return business.lifeTimeEarnings > 1000000000;
+    return business.lifeTimeEarnings > 1000000;
   }
 
   PurchaseAssetsVM(BuildContext context, this.business) {
