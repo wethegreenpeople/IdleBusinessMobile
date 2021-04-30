@@ -18,6 +18,10 @@ class PurchaseAssetsVM extends ChangeNotifier {
   int _purchaseAmount = 0; // Keep track of how many purchases we make in one go
   Timer _cashIncreaseTimer; // Timer to track our cash increase per second
 
+  bool get canViewMarketplace {
+    return business.lifeTimeEarnings > 1000000000;
+  }
+
   PurchaseAssetsVM(BuildContext context, this.business) {
     if (this.business != null &&
         this.business.sectorId == null &&
@@ -56,6 +60,7 @@ class PurchaseAssetsVM extends ChangeNotifier {
     this.business.espionageDefense += purchasable.espionageDefenseMod;
     if (purchasable.purchasableTypeId == 1) this.business.amountEmployed++;
     if (purchasable.purchasableTypeId == 2) this.business.amountOwnedItems++;
+    if (purchasable.purchasableTypeId == 4) purchasable.amountAvailable--;
     // Current adjusted cost
     purchasable.amountOwnedByBusiness +=
         1; // Increase amount owned after taking adjusted cost
@@ -69,6 +74,7 @@ class PurchaseAssetsVM extends ChangeNotifier {
           purchasable.amountOwnedByBusiness =
               value.purchasable.amountOwnedByBusiness;
           purchasable = value.purchasable;
+          purchasable.amountAvailable = value.purchasable.amountAvailable;
           this.business.cash = value.business.cash;
           this.business.cashPerSecond = value.business.cashPerSecond;
           this.business.amountEmployed = value.business.amountEmployed;

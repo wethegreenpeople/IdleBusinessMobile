@@ -2,9 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:idlebusiness_mobile/Stores/BusinessStore.dart';
 import 'package:idlebusiness_mobile/Stores/PurchasableStore.dart';
+import 'package:idlebusiness_mobile/Views/CreateItem/CreateItem.dart';
 import 'package:idlebusiness_mobile/Views/PurchaseAssets/PurchaseAssetsVM.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:provider/provider.dart';
 
 class PurchasableCards extends StatefulWidget {
@@ -24,6 +26,7 @@ class _PurchasableCardsState extends State<PurchasableCards> {
   Future<List<Purchasable>> futurePurchasables;
   List<Purchasable> purchasables;
   var purchaseAmount = 0;
+  var isMarketplaceInfoCollapsed = true;
 
   final PurchaseAssetsVM viewModel;
   final String purchasableTypeId;
@@ -73,6 +76,13 @@ class _PurchasableCardsState extends State<PurchasableCards> {
   Widget cardsFromPurchasableList(List<Purchasable> purchasableList) {
     var widgets = new List<Widget>();
 
+    if (this.purchasableTypeId == "4") {
+      widgets.add(marketplaceInfoCard());
+      if (!purchasableList.any((element) =>
+          element.createdByBusinessId == this.viewModel.business.id))
+        widgets.add(createMarketplaceItemCard());
+    }
+
     purchasableList.forEach((element) {
       if (isItemVisible(element, purchasableList, this.viewModel.business)) {
         widgets.add(Container(
@@ -105,6 +115,9 @@ class _PurchasableCardsState extends State<PurchasableCards> {
     if (purchasable.purchasableTypeId == 2 &&
         purchasable.maxItemsMod == 0 &&
         business.amountOwnedItems >= business.maxItemAmount) return false;
+    if (purchasable.purchasableTypeId == 4 &&
+        (purchasable.amountAvailable <= 0 ||
+            purchasable.createdByBusinessId == business.id)) return false;
     return true;
   }
 
@@ -139,9 +152,82 @@ class _PurchasableCardsState extends State<PurchasableCards> {
       child: cardPurchaseInfo(purchasable),
     );
   }
+
+  Card marketplaceInfoCard() {
+    return Card(
+        color: Colors.white,
+        child: InkWell(
+            onTap: () {
+              isMarketplaceInfoCollapsed = !isMarketplaceInfoCollapsed;
+              setState(() {});
+            },
+            child: AnimatedCrossFade(
+              duration: const Duration(milliseconds: 300),
+              firstChild: _collapsedMarketplaceInfoTile(),
+              secondChild: _exapandedMarketplaceInfoTile(),
+              crossFadeState: isMarketplaceInfoCollapsed
+                  ? CrossFadeState.showFirst
+                  : CrossFadeState.showSecond,
+            )));
+  }
+
+  Card createMarketplaceItemCard() {
+    return Card(
+        color: Colors.white,
+        child: InkWell(
+            onTap: () {
+              _pushMarketplaceItemCreationPage(context);
+            },
+            child: ListTile(
+                leading: Icon(Icons.add), title: Text("Create Item"))));
+  }
+
+  Future<void> _pushMarketplaceItemCreationPage(BuildContext context) async {
+    await pushNewScreen(
+      context,
+      screen: CreateItemPage(this.viewModel.business),
+      withNavBar: false,
+      pageTransitionAnimation: PageTransitionAnimation.cupertino,
+    );
+  }
+
+  ListTile _collapsedMarketplaceInfoTile() {
+    return ListTile(leading: Icon(Icons.info), title: Text("The Marketplace"));
+  }
+
+  ListTile _exapandedMarketplaceInfoTile() {
+    return ListTile(
+        leading: Icon(Icons.info),
+        title: Text("The Marketplace"),
+        subtitle: RichText(
+            text: TextSpan(
+          children: [
+            TextSpan(
+                style: TextStyle(color: Colors.grey),
+                text:
+                    "The Marketplace contains items that are created and sold by other businesses. Each business can create 1 item to sell on the marketplace, and will recieve a portion of the profit from each item sold.\n\nMarketplace items are limited quantity. The "),
+            WidgetSpan(
+                child: Icon(
+              MdiIcons.numeric9BoxMultipleOutline,
+              size: 16,
+            )),
+            TextSpan(
+                style: TextStyle(color: Colors.grey),
+                text:
+                    " icon will indicate how many of an item are left to purchase."),
+          ],
+        )));
+  }
 }
 
 ListTile cardPurchaseInfo(Purchasable purchasable) {
+  if (purchasable.purchasableTypeId == 4)
+    return _marketplacePurchasableItemInfo(purchasable);
+
+  return _regularPurchasableItemInfo(purchasable);
+}
+
+ListTile _regularPurchasableItemInfo(Purchasable purchasable) {
   return ListTile(
       title: Text("${purchasable.name} (${purchasable.amountOwnedByBusiness})"),
       subtitle: RichText(
@@ -185,6 +271,55 @@ ListTile cardPurchaseInfo(Purchasable purchasable) {
                       NumberFormat.compact().format(purchasable.maxItemsMod))),
           ...?cardBonusSpan((purchasable.isGlobalPurchase ? 1 : 0).toDouble(),
               MdiIcons.earth, TextSpan(text: "")),
+        ]),
+      ));
+}
+
+ListTile _marketplacePurchasableItemInfo(Purchasable purchasable) {
+  return ListTile(
+      title: Text("${purchasable.name}"),
+      subtitle: RichText(
+        text: TextSpan(style: TextStyle(color: Colors.blueGrey), children: [
+          TextSpan(
+              style: TextStyle(fontSize: 12),
+              text: "Created by ${purchasable.createdByBusinessName}\n\n"),
+          ...?cashSpan(purchasable),
+          ...?cardBonusSpan(
+              purchasable.cashPerSecondMod,
+              Icons.schedule,
+              TextSpan(
+                  text: NumberFormat.compactSimpleCurrency()
+                      .format(purchasable.cashPerSecondMod))),
+          ...?cardBonusSpan(
+              purchasable.maxEmployeeMod.toDouble(),
+              Icons.face,
+              TextSpan(
+                  text: NumberFormat.compact()
+                      .format(purchasable.maxEmployeeMod))),
+          ...?cardBonusSpan(
+              purchasable.espionageChanceMod.toDouble(),
+              MdiIcons.sword,
+              TextSpan(
+                  text: NumberFormat.percentPattern()
+                      .format(purchasable.espionageChanceMod))),
+          ...?cardBonusSpan(
+              purchasable.espionageDefenseMod.toDouble(),
+              MdiIcons.shieldOutline,
+              TextSpan(
+                  text: NumberFormat.percentPattern()
+                      .format(purchasable.espionageDefenseMod))),
+          ...?cardBonusSpan(
+              purchasable.maxItemsMod.toDouble(),
+              Icons.business_center,
+              TextSpan(
+                  text:
+                      NumberFormat.compact().format(purchasable.maxItemsMod))),
+          ...?cardBonusSpan((purchasable.isGlobalPurchase ? 1 : 0).toDouble(),
+              MdiIcons.earth, TextSpan(text: "")),
+          ...?cardBonusSpan(
+              (100).toDouble(),
+              MdiIcons.numeric9BoxMultipleOutline,
+              TextSpan(text: "${purchasable.amountAvailable}"))
         ]),
       ));
 }

@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 import 'package:idlebusiness_mobile/Helpers/AuthHelper.dart';
+import 'package:idlebusiness_mobile/Models/ApiResponse.dart';
 import 'package:idlebusiness_mobile/Models/BusinessPurchase.dart';
 import 'package:idlebusiness_mobile/Stores/BusinessStore.dart';
 import 'package:idlebusiness_mobile/Stores/StoreConfig.dart';
@@ -44,6 +45,48 @@ class PurchasableStore {
         return purchaseItem(businessId, purchasableId, purchaseAmount);
       } else {
         return null;
+      }
+    } catch (Exception) {
+      return null;
+    }
+  }
+
+  Future<ApiResponse> createMarketplaceItem(
+      int businessId, String itemName, int productionAmount,
+      {bool retry = true}) async {
+    bool _certificateCheck(X509Certificate cert, String host, int port) => true;
+
+    http.Client client() {
+      var ioClient = new HttpClient()
+        ..badCertificateCallback = _certificateCheck;
+      return new IOClient(ioClient);
+    }
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString("token");
+
+      final queryParams = {
+        "businessId": businessId.toString(),
+        "itemName": itemName,
+        "productionAmount": productionAmount.toString(),
+      };
+
+      final url = Uri.https(StoreConfig.apiUrl,
+          '/api/purchasable/createmarketplaceitem', queryParams);
+
+      final response = await client().post(url, headers: {
+        "Authorization": "Bearer $token",
+      });
+
+      if (response.statusCode == 200) {
+        return ApiResponse(true, response.body);
+      } else if (response.statusCode == 401 && retry) {
+        Auth.saveNewToken();
+        return createMarketplaceItem(businessId, itemName, productionAmount,
+            retry: false);
+      } else {
+        return ApiResponse(false, response.body);
       }
     } catch (Exception) {
       return null;
@@ -111,25 +154,32 @@ class Purchasable {
   bool isGlobalPurchase;
   bool isUpgrade;
   int purchasableUpgradeId;
+  int amountAvailable;
+  String createdByBusinessName;
+  int createdByBusinessId;
 
-  Purchasable(
-      {this.id,
-      this.name,
-      this.cost,
-      this.cashPerSecondMod,
-      this.amountOwnedByBusiness,
-      this.perOwnedMod,
-      this.maxEmployeeMod,
-      this.espionageChanceMod,
-      this.espionageDefenseMod,
-      this.maxItemsMod,
-      this.unlocksAtTotalEarnings,
-      this.purchasableTypeId,
-      this.description,
-      this.isSinglePurchase,
-      this.isGlobalPurchase,
-      this.isUpgrade,
-      this.purchasableUpgradeId});
+  Purchasable({
+    this.id,
+    this.name,
+    this.cost,
+    this.cashPerSecondMod,
+    this.amountOwnedByBusiness,
+    this.perOwnedMod,
+    this.maxEmployeeMod,
+    this.espionageChanceMod,
+    this.espionageDefenseMod,
+    this.maxItemsMod,
+    this.unlocksAtTotalEarnings,
+    this.purchasableTypeId,
+    this.description,
+    this.isSinglePurchase,
+    this.isGlobalPurchase,
+    this.isUpgrade,
+    this.purchasableUpgradeId,
+    this.amountAvailable,
+    this.createdByBusinessName,
+    this.createdByBusinessId,
+  });
 
   double calculateAdjustedCost() {
     return cost * pow((1 + perOwnedMod), amountOwnedByBusiness);
@@ -137,23 +187,27 @@ class Purchasable {
 
   static Purchasable fromJson(dynamic json) {
     return Purchasable(
-        id: json['Purchasable']['Id'],
-        name: json['Purchasable']['Name'],
-        cost: json['Purchasable']['Cost'],
-        cashPerSecondMod: json['Purchasable']['CashModifier'],
-        perOwnedMod: json['Purchasable']['PerOwnedModifier'],
-        maxEmployeeMod: json['Purchasable']['MaxEmployeeModifier'],
-        espionageChanceMod: json['Purchasable']['EspionageModifier'],
-        espionageDefenseMod: json['Purchasable']['EspionageDefenseModifier'],
-        maxItemsMod: json['Purchasable']['MaxItemAmountModifier'],
-        unlocksAtTotalEarnings: json['Purchasable']['UnlocksAtTotalEarnings'],
-        amountOwnedByBusiness: json['AmountOfPurchases'],
-        purchasableTypeId: json['Purchasable']['PurchasableTypeId'],
-        description: json['Purchasable']['Description'],
-        isSinglePurchase: json['Purchasable']['IsSinglePurchase'],
-        isGlobalPurchase: json['Purchasable']['IsGlobalPurchase'],
-        isUpgrade: json['Purchasable']['IsUpgrade'],
-        purchasableUpgradeId: json['Purchasable']['PurchasableUpgradeId']);
+      id: json['Purchasable']['Id'],
+      name: json['Purchasable']['Name'],
+      cost: json['Purchasable']['Cost'],
+      cashPerSecondMod: json['Purchasable']['CashModifier'],
+      perOwnedMod: json['Purchasable']['PerOwnedModifier'],
+      maxEmployeeMod: json['Purchasable']['MaxEmployeeModifier'],
+      espionageChanceMod: json['Purchasable']['EspionageModifier'],
+      espionageDefenseMod: json['Purchasable']['EspionageDefenseModifier'],
+      maxItemsMod: json['Purchasable']['MaxItemAmountModifier'],
+      unlocksAtTotalEarnings: json['Purchasable']['UnlocksAtTotalEarnings'],
+      amountOwnedByBusiness: json['AmountOfPurchases'],
+      purchasableTypeId: json['Purchasable']['PurchasableTypeId'],
+      description: json['Purchasable']['Description'],
+      isSinglePurchase: json['Purchasable']['IsSinglePurchase'],
+      isGlobalPurchase: json['Purchasable']['IsGlobalPurchase'],
+      isUpgrade: json['Purchasable']['IsUpgrade'],
+      purchasableUpgradeId: json['Purchasable']['PurchasableUpgradeId'],
+      amountAvailable: json['Purchasable']['AmountAvailable'],
+      createdByBusinessName: json['Purchasable']['CreatedByBusinessName'],
+      createdByBusinessId: json['Purchasable']['CreatedByBusinessId'],
+    );
   }
 
   static BusinessPurchase fromPurchaseResponse(dynamic json) {

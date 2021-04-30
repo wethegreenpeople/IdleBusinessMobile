@@ -32,6 +32,8 @@ dependencies:
   provider: ^5.0.0
   firebase_core: ^1.0.1
   firebase_analytics: ^7.1.1
+  numberpicker: ^2.1.1
+  url_launcher: ^6.0.3
 
 flutter_icons:
   android: "launcher_icon"
