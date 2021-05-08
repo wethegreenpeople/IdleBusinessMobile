@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:idlebusiness_mobile/Stores/BusinessStore.dart';
+import 'package:idlebusiness_mobile/Views/PurchaseAssets/PurchaseAssets.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 
 class CreateItemVM extends ChangeNotifier {
   final Business business;
@@ -41,5 +43,14 @@ class CreateItemVM extends ChangeNotifier {
 
   CreateItemVM(BuildContext context, this.business) {
     updateBusinessGains(this.business.id.toString());
+  }
+
+  Future<void> pushPurchaseAssetsScreen(BuildContext context) async {
+    await pushNewScreen(
+      context,
+      screen: PurchaseAssets(),
+      withNavBar: true,
+      pageTransitionAnimation: PageTransitionAnimation.cupertino,
+    );
   }
 }

@@ -176,19 +176,10 @@ class _PurchasableCardsState extends State<PurchasableCards> {
         color: Colors.white,
         child: InkWell(
             onTap: () {
-              _pushMarketplaceItemCreationPage(context);
+              viewModel.pushMarketplaceItemCreationPage(context);
             },
             child: ListTile(
                 leading: Icon(Icons.add), title: Text("Create Item"))));
-  }
-
-  Future<void> _pushMarketplaceItemCreationPage(BuildContext context) async {
-    await pushNewScreen(
-      context,
-      screen: CreateItemPage(this.viewModel.business),
-      withNavBar: false,
-      pageTransitionAnimation: PageTransitionAnimation.cupertino,
-    );
   }
 
   ListTile _collapsedMarketplaceInfoTile() {

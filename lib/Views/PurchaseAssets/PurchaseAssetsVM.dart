@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:idlebusiness_mobile/Helpers/AppHelper.dart';
 import 'package:idlebusiness_mobile/Stores/BusinessStore.dart';
 import 'package:idlebusiness_mobile/Stores/PurchasableStore.dart';
+import 'package:idlebusiness_mobile/Views/CreateItem/CreateItem.dart';
 import 'package:idlebusiness_mobile/Views/Login/Login.dart';
 import 'package:idlebusiness_mobile/Views/PurchaseAssets/CustomColors.dart';
 import 'package:idlebusiness_mobile/Views/Sector/Sector.dart';
@@ -116,7 +117,16 @@ class PurchaseAssetsVM extends ChangeNotifier {
     await pushNewScreen(
       context,
       screen: SectorPage(this.business),
-      withNavBar: false,
+      withNavBar: true,
+      pageTransitionAnimation: PageTransitionAnimation.cupertino,
+    );
+  }
+
+  Future<void> pushMarketplaceItemCreationPage(BuildContext context) async {
+    await pushNewScreen(
+      context,
+      screen: CreateItemPage(this.business),
+      withNavBar: true,
       pageTransitionAnimation: PageTransitionAnimation.cupertino,
     );
   }

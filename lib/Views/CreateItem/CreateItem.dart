@@ -226,7 +226,7 @@ class _CreateItemPageState extends State<CreateItemPage> {
                                     _viewModel.itemNameController.text,
                                     _viewModel.currentProductionAmountValue);
                             if (response.success)
-                              _pushPurchaseAssetsScreen(context);
+                              _viewModel.pushPurchaseAssetsScreen(context);
                             else {
                               showDialog(
                                   context: context,
@@ -242,14 +242,5 @@ class _CreateItemPageState extends State<CreateItemPage> {
                 )),
           ],
         ));
-  }
-
-  Future<void> _pushPurchaseAssetsScreen(BuildContext context) async {
-    await pushNewScreen(
-      context,
-      screen: PurchaseAssets(),
-      withNavBar: true,
-      pageTransitionAnimation: PageTransitionAnimation.cupertino,
-    );
   }
 }
