@@ -168,11 +168,10 @@ class Auth extends BaseAuth {
         return "true";
       } else if (response.statusCode == 401 && firstTry) {
         saveNewToken();
-        await this.signIn(email, password, false);
-        return "false";
+        return this.signUp(email, password, false);
       } else {
         _setLoginState(false);
-        return "false";
+        return response.body;
       }
     } catch (Exception) {
       saveNewToken();

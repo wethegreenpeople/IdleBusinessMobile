@@ -39,15 +39,16 @@ class _RegisterPageState extends State<RegisterPage> {
     });
 
     if (validateAndSave()) {
-      var success = await Auth().signUp(_email, _password, true, _businessName);
-      if (success == "true") {
+      var response =
+          await Auth().signUp(_email, _password, true, _businessName);
+      if (response == "true") {
         Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => MyHomePage(title: 'Purchase Assets')));
       } else {
         setState(() {
-          _errorMessage = "Invalid credentials";
+          _errorMessage = response;
           _isLoading = false;
         });
       }
