@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'package:idlebusiness_mobile/Helpers/AppHelper.dart';
@@ -114,6 +115,7 @@ class Auth extends BaseAuth {
       if (response.statusCode == 200) {
         _setLoginState(true);
         _saveBusinessId(json.decode(response.body)['Id'].toString());
+        debugPrint(response.body);
         return true;
       } else if (response.statusCode == 401 && firstTry) {
         saveNewToken();

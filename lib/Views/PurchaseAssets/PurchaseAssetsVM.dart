@@ -7,6 +7,7 @@ import 'package:idlebusiness_mobile/Stores/BusinessStore.dart';
 import 'package:idlebusiness_mobile/Stores/PurchasableStore.dart';
 import 'package:idlebusiness_mobile/Views/CreateItem/CreateItem.dart';
 import 'package:idlebusiness_mobile/Views/Login/Login.dart';
+import 'package:idlebusiness_mobile/Views/Login/Login2.dart';
 import 'package:idlebusiness_mobile/Views/PurchaseAssets/CustomColors.dart';
 import 'package:idlebusiness_mobile/Views/Sector/Sector.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
@@ -107,7 +108,7 @@ class PurchaseAssetsVM extends ChangeNotifier {
   Future<void> _pushLogin(BuildContext context) async {
     await pushNewScreen(
       context,
-      screen: LoginPage(),
+      screen: LoginScreen(),
       withNavBar: false,
       pageTransitionAnimation: PageTransitionAnimation.cupertino,
     );

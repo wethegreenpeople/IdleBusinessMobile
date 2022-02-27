@@ -1,4 +1,5 @@
 import 'package:firebase_analytics/observer.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:idlebusiness_mobile/Views/Login/Login.dart';
@@ -6,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'Helpers/LifeCycleHelper.dart';
 import 'Services/FireBase.dart';
 import 'Stores/BusinessStore.dart';
+import 'Views/Login/Login2.dart';
 import 'Views/Messages/Messages.dart';
 import 'Views/PurchaseAssets/CustomColors.dart';
 import 'Views/PurchaseAssets/PurchaseAssets.dart';
@@ -18,50 +20,54 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  final FirebaseAnalyticsObserver firebaseObserver =
-      FirebaseAnalyticsObserver(analytics: analytics);
-
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return OrientationBuilder(builder: (context, orientation) {
-          SizerUtil().init(constraints, orientation);
-          return MaterialApp(
-            title: 'IdleBusiness',
-            navigatorObservers: [firebaseObserver],
-            theme: ThemeData(
-              primarySwatch: CustomColors.colorPrimaryBlueAccent,
-              visualDensity: VisualDensity.adaptivePlatformDensity,
-              primaryColor: CustomColors.colorPrimaryBlue,
-              accentColor: CustomColors.colorPrimaryBlueAccent,
+    return FutureBuilder<FirebaseApp>(
+        future: Firebase.initializeApp(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                return OrientationBuilder(builder: (context, orientation) {
+                  return MaterialApp(
+                    title: 'IdleBusiness',
+                    theme: ThemeData(
+                      primarySwatch: CustomColors.colorPrimaryBlue,
+                      visualDensity: VisualDensity.adaptivePlatformDensity,
+                      primaryColor: CustomColors.colorPrimaryBlue,
+                      accentColor: CustomColors.colorPrimaryBlueAccent,
 
-              // Define the default TextTheme. Use this to specify the default
-              // text styling for headlines, titles, bodies of text, and more.
-              textTheme: TextTheme(
-                headline1:
-                    TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
-                headline6:
-                    TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
-                bodyText1: TextStyle(fontSize: 21.0, fontFamily: 'Hind'),
-                bodyText2: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
-              ),
-            ),
-            home: FutureBuilder<SharedPreferences>(
-                future: SharedPreferences.getInstance(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    if (snapshot.data?.getBool('isSignedIn') ?? false)
-                      return MyHomePage(
-                        title: 'Purchase Assets',
-                      );
-                  }
-                  return LoginPage();
-                }),
-          );
+                      // Define the default TextTheme. Use this to specify the default
+                      // text styling for headlines, titles, bodies of text, and more.
+                      textTheme: TextTheme(
+                        headline1: TextStyle(
+                            fontSize: 72.0, fontWeight: FontWeight.bold),
+                        headline6: TextStyle(
+                            fontSize: 36.0, fontStyle: FontStyle.italic),
+                        bodyText1:
+                            TextStyle(fontSize: 21.0, fontFamily: 'Hind'),
+                        bodyText2:
+                            TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
+                      ),
+                    ),
+                    home: FutureBuilder<SharedPreferences>(
+                        future: SharedPreferences.getInstance(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            if (snapshot.data?.getBool('isSignedIn') ?? false)
+                              return MyHomePage(
+                                title: 'Purchase Assets',
+                              );
+                          }
+                          return LoginScreen();
+                        }),
+                  );
+                });
+              },
+            );
+          }
+          return CircularProgressIndicator();
         });
-      },
-    );
   }
 }
 
