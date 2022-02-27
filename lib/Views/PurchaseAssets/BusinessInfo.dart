@@ -7,7 +7,6 @@ import 'package:idlebusiness_mobile/Views/PurchaseAssets/PurchaseAssetsVM.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
-import 'package:sizer/sizer.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class BusinessInfo extends StatefulWidget {
@@ -124,7 +123,7 @@ class _BusinessInfoState extends State<BusinessInfo> {
   Widget expandedCards() {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10.0),
-      height: 33.0.h,
+      height: 300,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: <Widget>[

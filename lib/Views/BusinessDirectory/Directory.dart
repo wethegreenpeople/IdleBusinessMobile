@@ -7,7 +7,6 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../PurchaseAssets/CustomColors.dart';
-import 'package:sizer/sizer.dart';
 
 class DirectoryPage extends StatefulWidget {
   DirectoryPage();
@@ -88,7 +87,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
                     title: Text(
                   "Most Successful Businesses",
                   style: TextStyle(
-                    fontSize: 18.0.sp,
+                    fontSize: 18.0,
                     fontStyle: FontStyle.italic,
                   ),
                 )),
@@ -124,7 +123,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
                       title: Text(
                     "Take a look at...",
                     style: TextStyle(
-                      fontSize: 18.0.sp,
+                      fontSize: 18.0,
                       fontStyle: FontStyle.italic,
                     ),
                   )),
@@ -167,7 +166,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
                               title: Text(
                               this.business?.name ?? "",
                               style: TextStyle(
-                                fontSize: 18.0.sp,
+                                fontSize: 18.0,
                                 fontStyle: FontStyle.italic,
                               ),
                             )),
@@ -179,7 +178,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
                                     leading: Icon(Icons.account_balance),
                                     title: Text(NumberFormat.compact().format(
                                         _viewModel.currentBusiness
-                                                .lifeTimeEarnings ??
+                                                ?.lifeTimeEarnings ??
                                             0)),
                                     subtitle: Text('Life Time'))),
                           ),
@@ -189,7 +188,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
                                     leading: Icon(Icons.score),
                                     title: Text(NumberFormat.compact().format(
                                         _viewModel.currentBusiness
-                                                .businessScore ??
+                                                ?.businessScore ??
                                             0)),
                                     subtitle: Text('Score'))),
                           )
@@ -219,7 +218,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
                     title: Text(
                   "Find Business",
                   style: TextStyle(
-                    fontSize: 18.0.sp,
+                    fontSize: 18.0,
                     fontStyle: FontStyle.italic,
                   ),
                 )),
@@ -243,8 +242,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
                     )),
                     Expanded(
                       child: Padding(
-                        padding:
-                            EdgeInsets.fromLTRB(10.0.w, 1.0.h, 10.0.w, 1.0.h),
+                        padding: EdgeInsets.fromLTRB(10.0, 1.0, 10.0, 1.0),
                         child: ElevatedButton(
                             onPressed: () async {
                               var result = await _viewModel.searchForBusiness(

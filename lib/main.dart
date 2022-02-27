@@ -11,7 +11,6 @@ import 'Views/Login/Login2.dart';
 import 'Views/Messages/Messages.dart';
 import 'Views/PurchaseAssets/CustomColors.dart';
 import 'Views/PurchaseAssets/PurchaseAssets.dart';
-import 'package:sizer/sizer.dart';
 import 'Views/BusinessDirectory/Directory.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 

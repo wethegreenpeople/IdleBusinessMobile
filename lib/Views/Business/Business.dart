@@ -6,7 +6,6 @@ import 'package:idlebusiness_mobile/Views/Business/BusinessVM.dart';
 import 'package:idlebusiness_mobile/Views/PurchaseAssets/CustomColors.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:sizer/sizer.dart';
 
 class BusinessPage extends StatefulWidget {
   final int _viewingBusinessId;
@@ -79,7 +78,7 @@ class _BusinessPageState extends State<BusinessPage> {
                     title: Text(
                   business.name,
                   style: TextStyle(
-                    fontSize: 18.0.sp,
+                    fontSize: 18.0,
                     fontStyle: FontStyle.italic,
                   ),
                 )),
@@ -137,13 +136,13 @@ class _BusinessPageState extends State<BusinessPage> {
                       title: Text(
                     business.name + "'s Investments",
                     style: TextStyle(
-                      fontSize: 18.0.sp,
+                      fontSize: 18.0,
                       fontStyle: FontStyle.italic,
                     ),
                   )),
                   SingleChildScrollView(
                     child: Container(
-                      height: 15.0.h,
+                      height: 15.0,
                       child: ListView(
                         children: [
                           ...businessInvestmentCards(business.investments)
@@ -174,13 +173,13 @@ class _BusinessPageState extends State<BusinessPage> {
                       title: Text(
                     business.name + "'s Espionages",
                     style: TextStyle(
-                      fontSize: 18.0.sp,
+                      fontSize: 18.0,
                       fontStyle: FontStyle.italic,
                     ),
                   )),
                   SingleChildScrollView(
                     child: Container(
-                      constraints: BoxConstraints(maxHeight: 15.0.h),
+                      constraints: BoxConstraints(maxHeight: 15.0),
                       child: ListView(
                         children: [
                           ...businessEspionageCards(business.espionages)
@@ -349,7 +348,7 @@ class _BusinessPageState extends State<BusinessPage> {
                   title: Text(
                     "Invest in business",
                     style: TextStyle(
-                      fontSize: 18.0.sp,
+                      fontSize: 18.0,
                       fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -357,7 +356,7 @@ class _BusinessPageState extends State<BusinessPage> {
                       "Invest in business for one day. Tomorrow, you will collect a percentage of the profits the invested company made between the investment time and market close."),
                 ),
                 Padding(
-                  padding: EdgeInsets.fromLTRB(5.0.w, 0, 0, 0),
+                  padding: EdgeInsets.fromLTRB(5.0, 0, 0, 0),
                   child: TextFormField(
                     controller: investmentAmountController,
                     maxLines: 1,
@@ -375,8 +374,7 @@ class _BusinessPageState extends State<BusinessPage> {
                   children: [
                     Expanded(
                       child: Padding(
-                        padding:
-                            EdgeInsets.fromLTRB(10.0.w, 1.0.h, 10.0.w, 1.0.h),
+                        padding: EdgeInsets.fromLTRB(10.0, 1.0, 10.0, 1.0),
                         child: ElevatedButton(
                             onPressed: () async {
                               var result = await _viewModel.investInBusiness(
@@ -447,7 +445,7 @@ class _BusinessPageState extends State<BusinessPage> {
                     title: Text(
                       "Commit espionage",
                       style: TextStyle(
-                        fontSize: 18.0.sp,
+                        fontSize: 18.0,
                         fontStyle: FontStyle.italic,
                       ),
                     ),
@@ -507,8 +505,7 @@ class _BusinessPageState extends State<BusinessPage> {
                   children: [
                     Expanded(
                       child: Padding(
-                        padding:
-                            EdgeInsets.fromLTRB(10.0.w, 1.0.h, 10.0.w, 1.0.h),
+                        padding: EdgeInsets.fromLTRB(10.0, 1.0, 10.0, 1.0),
                         child: ElevatedButton(
                             onPressed: () async {
                               var result = await _viewModel.espionageBusiness();
@@ -557,7 +554,7 @@ class _BusinessPageState extends State<BusinessPage> {
                     title: Text(
                       "Theft",
                       style: TextStyle(
-                        fontSize: 18.0.sp,
+                        fontSize: 18.0,
                         fontStyle: FontStyle.italic,
                       ),
                     ),
@@ -618,8 +615,7 @@ class _BusinessPageState extends State<BusinessPage> {
                   children: [
                     Expanded(
                       child: Padding(
-                        padding:
-                            EdgeInsets.fromLTRB(10.0.w, 1.0.h, 10.0.w, 1.0.h),
+                        padding: EdgeInsets.fromLTRB(10.0, 1.0, 10.0, 1.0),
                         child: ElevatedButton(
                             onPressed: () async {
                               var result =
@@ -665,7 +661,7 @@ class _BusinessPageState extends State<BusinessPage> {
                     title: Text(
                       "Arson",
                       style: TextStyle(
-                        fontSize: 18.0.sp,
+                        fontSize: 18.0,
                         fontStyle: FontStyle.italic,
                       ),
                     ),
@@ -726,8 +722,7 @@ class _BusinessPageState extends State<BusinessPage> {
                   children: [
                     Expanded(
                       child: Padding(
-                        padding:
-                            EdgeInsets.fromLTRB(10.0.w, 1.0.h, 10.0.w, 1.0.h),
+                        padding: EdgeInsets.fromLTRB(10.0, 1.0, 10.0, 1.0),
                         child: ElevatedButton(
                             onPressed: () async {
                               var result =

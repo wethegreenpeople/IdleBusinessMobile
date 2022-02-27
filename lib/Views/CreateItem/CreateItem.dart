@@ -9,7 +9,6 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:idlebusiness_mobile/Stores/BusinessStore.dart';
 import 'package:numberpicker/numberpicker.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
-import 'package:sizer/sizer.dart';
 
 class CreateItemPage extends StatefulWidget {
   final Business _business;
@@ -118,7 +117,7 @@ class _CreateItemPageState extends State<CreateItemPage> {
                       leading: Icon(MdiIcons.numeric9BoxMultipleOutline),
                       title: Text(
                         "Production Amount",
-                        style: TextStyle(fontSize: 12.0.sp),
+                        style: TextStyle(fontSize: 12.0),
                       ),
                     ),
                   )
@@ -148,13 +147,13 @@ class _CreateItemPageState extends State<CreateItemPage> {
                     children: [
                       Text(
                         "Cost to produce: ",
-                        style: TextStyle(fontSize: 12.0.sp),
+                        style: TextStyle(fontSize: 12.0),
                       ),
                       Text(
                         NumberFormat.compactSimpleCurrency()
                             .format(_viewModel.costToProduce),
                         style: TextStyle(
-                            fontSize: 10.0.sp, fontWeight: FontWeight.bold),
+                            fontSize: 10.0, fontWeight: FontWeight.bold),
                       )
                     ],
                   ),
@@ -165,13 +164,13 @@ class _CreateItemPageState extends State<CreateItemPage> {
                     children: [
                       Text(
                         "Cost per item: ",
-                        style: TextStyle(fontSize: 12.0.sp),
+                        style: TextStyle(fontSize: 12.0),
                       ),
                       Text(
                         NumberFormat.compactSimpleCurrency()
                             .format(_viewModel.costPerItem),
                         style: TextStyle(
-                            fontSize: 10.0.sp, fontWeight: FontWeight.bold),
+                            fontSize: 10.0, fontWeight: FontWeight.bold),
                       )
                     ],
                   ),
@@ -182,13 +181,13 @@ class _CreateItemPageState extends State<CreateItemPage> {
                     children: [
                       Text(
                         "CPS gain per item: ",
-                        style: TextStyle(fontSize: 12.0.sp),
+                        style: TextStyle(fontSize: 12.0),
                       ),
                       Text(
                         NumberFormat.compactSimpleCurrency()
                             .format(_viewModel.cpsGainPerItem),
                         style: TextStyle(
-                            fontSize: 10.0.sp, fontWeight: FontWeight.bold),
+                            fontSize: 10.0, fontWeight: FontWeight.bold),
                       )
                     ],
                   ),
@@ -199,13 +198,13 @@ class _CreateItemPageState extends State<CreateItemPage> {
                     children: [
                       Text(
                         "Revenue generated: ",
-                        style: TextStyle(fontSize: 12.0.sp),
+                        style: TextStyle(fontSize: 12.0),
                       ),
                       Text(
                         NumberFormat.compactSimpleCurrency()
                             .format(_viewModel.profit),
                         style: TextStyle(
-                            fontSize: 10.0.sp, fontWeight: FontWeight.bold),
+                            fontSize: 10.0, fontWeight: FontWeight.bold),
                       )
                     ],
                   ),

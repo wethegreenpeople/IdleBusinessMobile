@@ -5,7 +5,6 @@ import 'package:idlebusiness_mobile/Views/PurchaseAssets/PurchaseAssets.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:idlebusiness_mobile/Stores/BusinessStore.dart';
 import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
-import 'package:sizer/sizer.dart';
 
 class SectorPage extends StatefulWidget {
   Business _business;

@@ -27,7 +27,6 @@ dependencies:
   intl: ">=0.14.0"
   shared_preferences: ^2.0.5
   material_design_icons_flutter: ^5.0.6595
-  sizer: ^2.0.15
   persistent_bottom_nav_bar: ^4.0.2
   provider: ^6.0.1
   firebase_core: ^1.0.1

@@ -4,7 +4,6 @@ import 'package:idlebusiness_mobile/Models/Message.dart';
 import 'package:idlebusiness_mobile/Views/PurchaseAssets/CustomColors.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'MessagesVM.dart';
-import 'package:sizer/sizer.dart';
 
 class MessagesPage extends StatefulWidget {
   MessagesPage();
@@ -40,7 +39,7 @@ class _MessagesPageState extends State<MessagesPage> {
                             children: [
                               SingleChildScrollView(
                                 child: Container(
-                                  height: 78.0.h,
+                                  height: 78.0,
                                   child: RefreshIndicator(
                                     onRefresh: () async {
                                       setState(() {});

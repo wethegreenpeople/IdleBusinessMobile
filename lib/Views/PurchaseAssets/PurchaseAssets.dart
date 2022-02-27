@@ -79,7 +79,10 @@ class _PurchaseAssetsState extends State<PurchaseAssets> {
                   child: Scaffold(
                       backgroundColor: CustomColors.colorPrimaryBlue,
                       appBar: AppBar(
-                        title: Text("Purchase Assets"),
+                        title: Text(
+                          "Purchase Assets",
+                          style: TextStyle(fontSize: 30),
+                        ),
                         backgroundColor: CustomColors.colorPrimaryBlueAccent,
                         bottom: TabBar(labelPadding: EdgeInsets.all(0), tabs: [
                           Tab(
