@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:idlebusiness_mobile/Helpers/AuthHelper.dart' as AuthHelper;
 import 'package:idlebusiness_mobile/Views/PurchaseAssets/CustomColors.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import '../../main.dart';
 
 const users = const {
@@ -49,6 +50,19 @@ class LoginScreen extends StatelessWidget {
       onSignup: _signupUser,
       additionalSignupFields: [
         UserFormField(keyName: "businessName", displayName: "Business Name")
+      ],
+      loginProviders: [
+        LoginProvider(
+          icon: MdiIcons.accountCowboyHat,
+          label: 'Guest',
+          callback: () async {
+            var success = await AuthHelper.Auth().createGuestAccount();
+            if (success) {
+              return null;
+            }
+            return 'Could not create guest account';
+          },
+        )
       ],
       theme: LoginTheme(
         primaryColor: Color.fromARGB(255, 113, 178, 207),

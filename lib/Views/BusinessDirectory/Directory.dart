@@ -292,7 +292,7 @@ class _DirectoryPageState extends State<DirectoryPage> {
         child: InkWell(
           onTap: () {
             _viewModel.navigateToBusiness(
-                context, this.business.id, element.id);
+                context, this.business?.id, element.id);
           },
           child: ListTile(
             leading: Icon(MdiIcons.trophyVariant),
